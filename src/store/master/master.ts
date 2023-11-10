@@ -6,6 +6,7 @@ import { Master } from '../../wrappers/Master'
 import { JettonMinter } from '../../wrappers/JettonMinter'
 import { Helper } from '../../wrappers/Helper'
 import { Sender } from '../../wrappers/Sender';
+import { JettonWallet } from '@ton/ton';
 import { Address, Cell, OpenedContract, toNano } from '@ton/core'
 import axios from 'axios';
 
@@ -147,7 +148,30 @@ class MasterStore {
 		const Info = await MasterContact.getContractData();
 		const jettonsAmount = Info.jettonsAmount;
 		const jusdAmount = Info.jusdAmount;
+		console.log(amount, jusdAmount, jettonsAmount)
 		return amount * jusdAmount * 85n /  jettonsAmount / 100n;
+	}
+
+	MaxBuyLimit = async (tonConnectUI: TonConnectUI, amount: bigint) => {
+		if (tonConnectUI.account?.address == null) return
+		const endpoint = await getHttpEndpoint(); 
+		const client = new TonClient({
+			endpoint
+		});
+		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
+		const HelperContact = client.open(await MasterContact.getHelper(Address.parse(tonConnectUI.account?.address)));
+		const Data = await HelperContact.getContractData();
+		return Data.beginTime;
+	}
+
+	GetBalance = async () => {
+		const endpoint = await getHttpEndpoint(); 
+		const client = new TonClient({
+			endpoint
+		});
+		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
+		const Data = await MasterContact.getContractData();
+		return Data.jettonsAmount;
 	}
 
 }

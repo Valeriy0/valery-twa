@@ -35,6 +35,8 @@ async function GetToken() {
 function Main() {
 	const [ModalBuy, setModalBuy] = useState(false);
 	const [ModalSell, setModalSell] = useState(false);
+	const [OneToken, setOneToken] = useState(localStorage['OneToken'] == null ? 0.1 : localStorage['OneToken']);
+	const [Balance, setBalance] = useState(0n);
 	const [ModalBuyLimit, setModalBuyLimit] = useState(false);
 	const [BuyMax, setBuyMax] = useState(false);
 	const wallet = useTonWallet();
@@ -44,6 +46,9 @@ function Main() {
 	useEffect(() => {
 		console.log(tonConnectUI.account?.address);
 		async function datesInit() {
+			setBalance(await MasterStore.GetBalance());
+			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+			localStorage['OneToken'] = OneToken;
 			const L = await MasterStore.GetLimit(tonConnectUI);
 			console.log(12, L);
 			if (L != null) {
@@ -61,13 +66,13 @@ function Main() {
 	}
 
 	async function ConvertBuy() {
-		let amount = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value);
-		(document.getElementById("BuyToken") as HTMLInputElement).value = (await MasterStore.ConvertBuy(amount)).toString();
+		let amount = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value);
+		(document.getElementById("BuyToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertBuy(amount)).toString()) / parseInt(toNano(1).toString())).toString();
 	}
 
 	async function ConvertSell() {
-		let amount = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value);
-		(document.getElementById("SellToken") as HTMLInputElement).value = (await MasterStore.ConvertSell(amount)).toString();
+		let amount = toNano((document.getElementById("SelljUSD") as HTMLInputElement).value);
+		(document.getElementById("SellToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertSell(amount)).toString()) / parseInt(toNano(1).toString())).toString();
 	}
 	
 	function SellTokens() {
@@ -83,12 +88,12 @@ function Main() {
 		<>
 			<div>
 				<Marquee className={styles.Ticker}>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-					<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
 
 				</Marquee>
 				<div className={styles.Balance}>
