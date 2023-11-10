@@ -56,10 +56,8 @@ function Main() {
 	  }, [])
 
 	function BuyTokens() {
-		// let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-		// let token = Address.parse((document.getElementById("BuyToken") as HTMLInputElement).value);
-		// MasterStore.Deploy(tonConnectUI, cnt, token);
-		MasterStore.Buy(tonConnectUI)
+		let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+		MasterStore.Buy(tonConnectUI, cnt)
 	}
 
 	async function ConvertBuy() {
@@ -73,10 +71,8 @@ function Main() {
 	}
 	
 	function SellTokens() {
-		// let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-		// let token = Address.parse((document.getElementById("BuyToken") as HTMLInputElement).value);
-		// MasterStore.Deploy(tonConnectUI, cnt, token);
-		MasterStore.Sell(tonConnectUI)
+		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
+		MasterStore.Sell(tonConnectUI, cnt)
 	}
 	
 	
@@ -170,11 +166,11 @@ function Main() {
 					<h1 className={styles.ModalSellDetail}>1 token = 100jUSD</h1>
 					<div className={styles.ModalSellInputs}>
 						<div className={styles.ModalSellBlockInput}>
-							<h1 className={styles.ModalSellBlockInput_Title}>jUSD</h1>
+							<h1 className={styles.ModalSellBlockInput_Title}>Token</h1>
 							<input onChange={ConvertSell} type="text" id='SelljUSD' className={styles.ModalSellBlockInput_Input} />
 						</div>
 						<div className={styles.ModalSellBlockInput}>
-							<h1 className={styles.ModalSellBlockInput_Title}>Token</h1>
+							<h1 className={styles.ModalSellBlockInput_Title}>jUSD</h1>
 							<input type="text" id='SellToken' disabled className={styles.ModalSellBlockInput_Input} />
 						</div>
 					</div>

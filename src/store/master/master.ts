@@ -10,25 +10,25 @@ import { Address, Cell, OpenedContract, toNano } from '@ton/core'
 import axios from 'axios';
 
 class MasterStore {
-	MasterAddress = "EQBmRg6fKaByVlEmeSNsJbwcBbSBESG0xkC9lNf8dK_8kDGo"; 
+	MasterAddress = "EQD0cE0tyeIgg00fVTCiLh5aC1uKMt5_RrMoTrfzwpvTLvAM"; 
 	MinterJusdAddress = "EQDjwcQzRCUSiy8Y0sIQDoIwxSqaErJdRpmzENl6YlnqcDy-";
-	MinterCustomAddress = "EQDAwGfBNsQ0qvGrtax9hyi9VjvAP-StY0QZ0KiNU6HEhIZ1"; 
+	MinterCustomAddress = "EQBWAHbpSrSGoAb2rd21B9lofgvl_eT5kkqtYAYWMdxs_dVT"; 
 	client: TonClient | null = null;
 
     constructor() {
 		makeAutoObservable(this);
 	}
 
-	Buy = async (tonConnectUI: TonConnectUI ) => {
+	Buy = async (tonConnectUI: TonConnectUI, amount: bigint) => {
 		if (tonConnectUI.account?.address == null) return;
 		const body = beginCell()
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
-        .storeCoins(toNano(10)) // amount                
+        .storeCoins(toNano(amount)) // amount                
         .storeAddress(Address.parse(this.MasterAddress))                 
         .storeAddress(Address.parse(tonConnectUI.account.address))             
         .storeUint(0, 1)                      
-        .storeCoins(toNano(0.05))               
+        .storeCoins(toNano(0.3))               
         .storeUint(0,1)                        
         .endCell();
 		const endpoint = await getHttpEndpoint(); 
@@ -51,12 +51,12 @@ class MasterStore {
 		})
 	}
 
-	Sell = async (tonConnectUI: TonConnectUI ) => {
+	Sell = async (tonConnectUI: TonConnectUI, amount: bigint) => {
 		if (tonConnectUI.account?.address == null) return;
 		const body = beginCell()
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
-        .storeCoins(toNano(0.000002)) // amount                
+        .storeCoins(toNano(amount)) // amount                
         .storeAddress(Address.parse(this.MasterAddress))                 
         .storeAddress(Address.parse(tonConnectUI.account.address))             
         .storeUint(0, 1)                      
