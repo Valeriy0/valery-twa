@@ -1,0 +1,153 @@
+.MainImg {
+	margin-left: auto;
+	margin-right: auto;
+	width: 134px;
+	height: 141px;	
+}
+
+.Ticker {
+	border: 1px solid #1F344C;
+	background: #171B22;
+	height: 20px;
+	align-items: center;
+	vertical-align: middle;
+	&_Text {
+		margin-right: 30px;
+		color: #627282;
+		font-size: 12px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+}
+
+.Center {
+	&Img {
+		margin-top: 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&Info {
+		display: flex;
+		flex-direction: column;
+		gap: 7px;
+	}
+
+}
+
+.About {
+	&Text {
+		color: #9FD1FF;
+		text-align: center;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+	
+	&Buttons {
+		margin-top: 36px;
+		display: flex;
+		gap: 25px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+.MainPdf {
+	margin-top: 44px;
+	width: 335px;
+	height: 185px;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+	background: #1F2734;
+
+	&_Text {
+		color: #2591F5;
+		margin-top: 25px;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+
+	&_Title {
+		color: #FFF;
+		margin-top: 22px;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+
+	&_Button {
+		margin-top: 21px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 295px;
+		height: 50px;
+		border-radius: 8px;
+		background: #2591F5;
+		color: #FFF;
+		vertical-align: middle;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&_Title {
+			display: inline;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	}
+}
+
+.Footer {
+	width: 335px;
+	height: 56px;
+	position: absolute;
+	bottom: 0;
+	left:50%;
+	transform: translate(-50%, 0%);
+	border-radius: 10px 10px 0px 0px;
+	background: #0D0D0D; 
+	display: flex;
+
+	&Button {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		& img {
+			width: 36px;
+			height: 36px;
+		}
+
+		&Active {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 83px;
+			height: 46px;
+			border-radius: 10px;
+			border: 1px solid #2591F5;
+			background: rgba(37, 145, 245, 0.10);
+		}
+	}
+}
+
+.cursor_pointer {
+	cursor: pointer;
+}

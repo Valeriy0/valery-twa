@@ -1,0 +1,609 @@
+.Main {
+	overflow-x: hidden;
+	position: relative;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: 73px;
+	@media (min-width: 768px) {
+		justify-content: space-around;
+		gap: 0px;
+	}
+}
+
+.ConnectTon {
+	display: flex;
+	flex-direction: column;
+	gap: 23px;
+}
+
+.Rocket {
+	width: 244px;
+	height: 287px;
+	margin-top: 109px;
+	margin-left: auto;
+	margin-right: auto;
+	@media (min-width: 768px) {
+		margin-top: 0px;
+	}
+}
+
+.Instruction {
+	display: flex;
+	gap: 0px;
+	margin-left: auto;
+	margin-right: auto;
+
+	&__Title {
+		margin-top: auto;
+		margin-bottom: auto;
+		height: auto;
+		color: #7B7B7B;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+}
+
+.Ticker {
+	border: 1px solid #1F344C;
+	background: #171B22;
+	height: 20px;
+	align-items: center;
+	vertical-align: middle;
+	&_Text {
+		margin-right: 30px;
+		color: #627282;
+		font-size: 12px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+}
+
+.Balance {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	text-align: center;
+	&_Img {
+		width: 240px;
+		margin-left: auto;
+		padding-left: 20px;
+		margin-right: auto;
+		margin-top: -77px;
+	}
+	&_ImgActive {
+		width: 240px;
+		margin-left: auto;
+		padding-left: 20px;
+		margin-right: auto;
+		margin-top: -60px;
+	}
+	&_Title {
+		margin-top: -20px;
+		color: #9FD1FF;
+		text-align: center;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+		margin-bottom: 4px;
+	}
+	&_Token {
+		display: flex;
+		gap: 10px;
+		width: max-content;
+		margin-left: auto;
+		margin-right: auto;
+		&Text {
+			color: #FFF;
+			text-align: center;
+			font-size: 20px;
+			font-style: normal;
+			font-weight: 700;
+			line-height: normal;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	}
+	&_USD {
+		color: #676767;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+	}
+}
+
+.BuyLimit {
+	display: flex;
+	flex-direction: column;
+	margin-top: 14px;
+	width: 335px;
+	height: 185px;
+	border-radius: 10px;
+	background: #1F2734;
+	margin-left: auto;
+	margin-right: auto;
+	@media (min-height: 600px) {
+		margin-top: 27px;
+	}
+
+	&_Title {
+		width: max-content;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 22px;
+		display: flex;
+		gap: 5px;
+		&Text {
+			color: #2591F5;
+			text-align: center;
+			font-size: 18px;
+			font-style: normal;
+			font-weight: 400;
+			line-height: normal;
+		}
+ 	}
+}
+
+.Line {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin-top: 29px;
+	width: max-content;
+	margin-left: auto;
+	margin-right: auto;
+
+	&__Nums {
+		display: flex;
+		width: 295px;
+		justify-content: space-between;
+		color: #2591F5;
+		
+		&Text {
+			font-size: 14px;
+			font-style: normal;
+			font-weight: 400;
+			line-height: normal;
+		}
+	}
+
+	&How {
+		width: 295px;
+		height: 25px;
+		border-radius: 16px;
+		background: #18202C;
+	}
+}
+
+.GreenLine {
+	width: 114px;
+	height: 23px;
+	border-radius: 16px;
+	background: #00E217;
+}
+
+.MaxBuy {
+	margin-top: 21px;
+	color: #FFF;
+	text-align: center;
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+}
+
+.MaxBuy2 {
+	margin-top: 16px;
+	color: #9FD1FF;
+	text-align: center;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+}
+
+.Buttons {
+	display: flex;
+	width: max-content;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 20px;
+	gap: 10px;
+	color: #FFF;
+	text-align: center;
+	font-size: 18px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+
+	&Buy {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		width: 226px;
+		height: 56px;
+		border-radius: 10px;
+		background: #00CA14;
+	} 
+
+	&Buy2 {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		width: 226px;
+		height: 56px;
+		border-radius: 10px;
+		background: #0F6A18;
+	} 
+
+	&Sell {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		width: 99px;
+		height: 56px;
+		border-radius: 10px;
+		background: rgba(187, 44, 35, 0.40);
+	}
+}
+
+.Footer {
+	width: 335px;
+	height: 56px;
+	position: absolute;
+	bottom: 0;
+	left:50%;
+	transform: translate(-50%, 0%);
+	border-radius: 10px 10px 0px 0px;
+	background: #0D0D0D; 
+	display: flex;
+
+	&Button {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		& img {
+			width: 36px;
+			height: 36px;
+		}
+
+		&Active {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 83px;
+			height: 46px;
+			border-radius: 10px;
+			border: 1px solid #2591F5;
+			background: rgba(37, 145, 245, 0.10);
+		}
+	}
+}
+
+.BlackWindow {
+	position: absolute;
+	z-index: 0;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.80);
+}
+
+.ModalWindow {
+	position: relative;
+	z-index: 10;
+	width: 375px;
+	height: 354px;
+	border-radius: 10px;
+	background: #28282A;
+	margin-top: 246px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.ModalBuy {
+	&Title {
+		margin-top: 12px;
+		color: #FFF;
+		text-align: center;
+		font-size: 20px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+	}
+
+	&Detail {
+		margin-top: 7px;
+		color: #2591F5;
+		text-align: center;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+
+	&Inputs {
+		margin-top: 27px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+
+	&BlockInput {
+		display: flex;
+		gap: 5px;
+		flex-direction: column;
+		margin-left: auto;
+		margin-right: auto;
+
+		&_Title {
+			color: #9FD1FF;
+			font-size: 14px;
+			font-style: normal;
+			font-weight: 400;
+			line-height: normal;
+		}
+
+		&_Input {
+			width: 335px;
+			height: 45px;
+			border-radius: 10px;
+			background: #212123;
+			border: 0;
+		}
+	}
+
+	&Button {
+		margin-top: 22px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 335px;
+		height: 50px;
+		border-radius: 8px;
+		background: #00CA14;
+		color: #FFF;
+		vertical-align: middle;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&_Title {
+			display: inline;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	}
+}
+
+.ModalSell {
+	&Title {
+		margin-top: 12px;
+		color: #FFF;
+		text-align: center;
+		font-size: 20px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+	}
+
+	&Detail {
+		margin-top: 7px;
+		color: #2591F5;
+		text-align: center;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+
+	&Inputs {
+		margin-top: 27px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+
+	&BlockInput {
+		display: flex;
+		gap: 5px;
+		flex-direction: column;
+		margin-left: auto;
+		margin-right: auto;
+
+		&_Title {
+			color: #9FD1FF;
+			font-size: 14px;
+			font-style: normal;
+			font-weight: 400;
+			line-height: normal;
+		}
+
+		&_Input {
+			width: 335px;
+			height: 45px;
+			border-radius: 10px;
+			background: #212123;
+			border: 0;
+		}
+	}
+
+	&Button {
+		margin-top: 22px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 335px;
+		height: 50px;
+		border-radius: 8px;
+		background: #BB2C23;
+		color: #FFF;
+		vertical-align: middle;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&_Title {
+			display: inline;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	}
+}
+
+.ModalBuyLimit {
+	&Title {
+		margin-top: 20px;
+		color: #FFF;
+		text-align: center;
+		font-size: 20px;
+		font-style: normal;
+		font-weight: 700;
+		line-height: normal;
+	}
+
+	&Text {
+		max-height: 180px;
+		max-width: 315px;
+		margin-left: auto;
+		margin-right: auto;
+		margin-top: 26px;
+		color: #FFF;
+		font-size: 16px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: 115%; /* 18.4px */
+		opacity: 0.5;
+	}
+
+	&Button {
+		position: absolute;
+		bottom: 50px;
+		left: 50%;
+		transform: translateX(-50%);
+		margin-top: 22px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 335px;
+		height: 50px;
+		border-radius: 8px;
+		background: #494848BF;
+		color: #FFF;
+		vertical-align: middle;
+		text-align: center;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&_Title {
+			display: inline;
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+	}
+}
+
+.Arrow {
+	position: absolute;
+	top: 160px;
+	right: 30px;
+}
+
+.Cancel {
+	position: absolute;
+	width: 40px;
+	height: 40px;
+	right: 10px;
+	top: 10px;
+
+	&Img {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+}
+
+.tonConnectBtn {
+	width: max-content;
+	margin-left: auto;
+	margin-right: auto;
+	&__btn {
+		div {
+			tc-root {
+				button {
+					padding-left: 81px;
+					padding-right: 81px;
+					padding-top: 28px;
+					padding-bottom: 28px;
+					height: 48px;
+					background-color: #0088CB;
+					border-radius: 12px;
+					display: flex;
+					align-items: center;
+					transition: 0.15s ease-out;
+					svg {
+						display: none;
+					}
+					div {
+						font-family: 'Intro Regular';
+						font-style: normal;
+						font-weight: 400;
+						font-size: 18px;
+						line-height: normal;
+						white-space: nowrap;
+					}
+					&:hover {
+					transform: none;
+					background-color: #00A1F0;
+					}
+					&:active {
+					background-color: #0177B0;
+					}
+				}
+			}
+		}
+		@media (max-width: 600px) {
+			div {
+				tc-root {
+					button {
+						height: 40px;
+						padding-left: 81px;
+						padding-right: 81px;
+						padding-top: 28px;
+						padding-bottom: 28px;
+					}
+				}
+			}
+		}
+	}
+}
+
+input, input:active, input:hover, input:focus {
+	padding-left: 15px;
+	font-size: 22px;
+	color: white;
+	outline: none;
+	border: 0;
+}
+
+.cursor_pointer {
+	cursor: pointer;
+}

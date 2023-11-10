@@ -1,0 +1,15 @@
+@font-face {
+  font-family: "Intro Regular";
+  src: url("/intro_regular.ttf");
+}
+
+* {
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden;
+}
+
+:root {
+  background: #111;
+  font-family: Intro Regular;
+}
