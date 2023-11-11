@@ -39,14 +39,13 @@ function Main() {
 			localStorage["OneToken"] = await OneToken;
 			setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 			localStorage["BalanceUSD"] = await BalanceUSD;
+			await GreenLineF();
 		}
 
 		Balances();
 	}, [])
 
-	async function FindAllInformation() {
-		if (!Can) return;
-		setCan(false);
+	async function GreenLineF() {
 		const TempBuyMaxLimit = (await MasterStore.MaxBuyLimit(tonConnectUI));
 		setBuyMaxLimit(TempBuyMaxLimit);
 		localStorage["BuyMaxLimit"] = TempBuyMaxLimit;
@@ -61,6 +60,12 @@ function Main() {
 				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()))}px;`);
 			}
 		}
+	}
+
+	async function FindAllInformation() {
+		if (!Can) return;
+		setCan(false);
+		await GreenLineF();
 	}  
 
 	function BuyTokens() {
