@@ -306,6 +306,10 @@
 	margin-top: 246px;
 	margin-left: auto;
 	margin-right: auto;
+	@media (min-height: 605px) {
+		margin-top: 100px;
+	}
+
 }
 
 .ModalBuy {
@@ -625,4 +629,11 @@ input, input:active, input:hover, input:focus {
 	font-style: normal;
 	font-weight: 600;
 	line-height: normal;
+}
+
+.InvalidNumber {
+	font-size: 14px;
+	margin-top: -14px;
+	margin-left: 12.5px;
+	color: #BB2C23;
 }

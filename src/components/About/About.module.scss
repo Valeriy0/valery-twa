@@ -157,3 +157,23 @@
 	top: 31px;
 	right: 9px;
 }
+
+.BlockCopy {
+	border-radius: 8px;
+	background: #1F2734;
+	color: #9FD1FF;
+	height: auto;
+	width: 92px;
+	position: absolute;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 18px;
+	top: 10px;
+	right: 10px;
+	z-index: 10;
+	transition: 2s;
+	&Text {
+		margin-top: 4px;
+		margin-bottom: 4px;
+	}
+}

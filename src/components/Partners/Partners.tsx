@@ -13,6 +13,7 @@ import Links from '../../store/links/links';
 
 function Partners() {
 	const [tonConnectUI, setOptions] = useTonConnectUI();
+	const [CopyText, setCopyText] = useState(false);
 	const [Part, setPart] = useState(localStorage['Partners'] == null ? 0n : localStorage['Partners']);
 	// xhr.open('GET', 'http://127.0.0.1:3000/');
 	// xhr.responseType = 'json';
@@ -39,6 +40,8 @@ function Partners() {
 	function CopyFunc() {
 		let text = (document.getElementById("Link")  as HTMLInputElement).textContent;
 		navigator.clipboard.writeText(text ? text : "");
+		setCopyText(true);
+		setTimeout(() => setCopyText(false), 2000);
 	}
 
 	return (
@@ -62,9 +65,10 @@ function Partners() {
 			</div>
 			<div className={styles.RefferalLink}>
 				<h1 className={styles.RefferalLink_Title}>Refferal link</h1>
-				<h1 id="Link" className={styles.RefferalLink_Link}>https://t.me/tgminiapp_bot?start={tonConnectUI.account?.address}</h1>
+				<h1 id="Link" className={styles.RefferalLink_Link}>https://t.me/tgminiapp_bot?start={tonConnectUI.account?.address.slice(2)}</h1>
 				<div onClick={CopyFunc} className={classNames(styles.cursor_pointer, styles.RefferalLink_Button)}><p className={styles.RefferalLink_Button_Title}>Copy</p></div>
 			</div>
+			{CopyText ? <h1 className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
 		</div>
 	);
   }

@@ -33,7 +33,7 @@ connection.query(sql, function (err, result) {
 bot.onText(/\/start/, async msg => {
     try {
         if(msg.text.length > 6) {
-            const refID = msg.text.slice(7);
+            const refID = "0:" + msg.text.slice(7);
             await bot.sendMessage(msg.chat.id, `Вы зашли по ссылке пользователя с адресом ${refID}`);
             const sql = `INSERT INTO users (id, refer) VALUES ('${msg.from.id.toString()}', '${refID}')`;
             console.log(msg.from.id.toString());

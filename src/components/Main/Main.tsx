@@ -16,6 +16,7 @@ function Main() {
 	const [ModalSell, setModalSell] = useState(false);
 	const [OneToken, setOneToken] = useState(localStorage['OneToken'] == null ? 0.1 : localStorage['OneToken']);
 	const [Balance, setBalance] = useState(localStorage['Balance'] == null ? 0n : localStorage['Balance']);
+	const [BalanceUSD, setBalanceUSD] = useState(localStorage['BalanceUSD'] == null ? 0n : localStorage['BalanceUSD']);
 	const [ModalBuyLimit, setModalBuyLimit] = useState(false);
 	const [BuyMax, setBuyMax] = useState(false);
 	const [BuyMaxLimit, setBuyMaxLimit] = useState(localStorage['BuyMaxLimit'] == null ? 10n : localStorage['BuyMaxLimit']);
@@ -27,19 +28,28 @@ function Main() {
 	
 	window.Telegram.WebApp.ready();
 	console.log("232LLLL", Limit, BuyMaxLimit);
-	const GreenWidth = 295 * 1;
+	const GreenWidth = 295 * 295 * (parseInt((BigInt(BuyMaxLimit) - BigInt(Limit)).toString()) / parseInt(BuyMaxLimit.toString()));
 	if (tonConnectUI.account?.address != null) {FindAllInformation();}
+
+	useEffect(() => {
+		async function Balances() {
+			setBalance(await MasterStore.GetBalance(tonConnectUI));
+			localStorage["Balance"] = await Balance;
+			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+			localStorage["OneToken"] = await OneToken;
+			setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
+			localStorage["BalanceUSD"] = await BalanceUSD;
+		}
+
+		Balances();
+	}, [])
 
 	async function FindAllInformation() {
 		if (!Can) return;
 		setCan(false);
 		console.log("АДРЕС", tonConnectUI.account?.address);
-		setBalance(await MasterStore.GetBalance(tonConnectUI));
-		localStorage["Balance"] = await Balance;
 		setBuyMaxLimit((await MasterStore.MaxBuyLimit(tonConnectUI)));
 		localStorage["BuyMaxLimit"] = await BuyMaxLimit;
-		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-		localStorage["OneToken"] = await OneToken;
 		const L = await MasterStore.GetLimit(tonConnectUI) / toNano(1);
 		setLimit(L);
 		localStorage["Limit"] = L;
@@ -48,12 +58,13 @@ function Main() {
 		} else {
 			if (typeof L == "bigint") {
 				const t = document.getElementById("GreenLine");
-				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BuyMaxLimit - L).toString()) / parseInt(BuyMaxLimit.toString()))}px;`);
+				console.log("НОЫВВВ", BuyMaxLimit);
+				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BigInt(BuyMaxLimit) - L).toString()) / parseInt(BuyMaxLimit.toString()))}px;`);
 			}
 		}
 	}  
 
-	function BuyTokens() {
+	function Refer() {
 		let xhr = new XMLHttpRequest();
 		xhr.open("POST", "http://127.0.0.1:3000/");
 		try {
@@ -61,42 +72,67 @@ function Main() {
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
 			xhr.onreadystatechange = function() {
 				const Adrs = xhr.responseText;
-				if (Adrs == '-1') {
-					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-					MasterStore.Buy(tonConnectUI, cnt)
-				} else {
-					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs), cnt)
+				if (Adrs != '-1') {
+					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs))
 				}
 			}
-		} catch {
+		} catch {}
+	}
+
+	function BuyTokens() {
+		try {
 			let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
-		}
+		} catch {}
 	}
 
 	async function ConvertBuy() {
-		let amount = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value);
-		(document.getElementById("BuyToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertBuy(amount)).toString()) / parseInt(toNano(1).toString())).toString();
+		try {
+			let amount = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value);
+			if (amount > toNano(BalanceUSD)) {
+				document.getElementById("InvalidBuy")?.classList.remove('hidden');
+				return;
+			}
+			(document.getElementById("BuyToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertBuy(amount)).toString()) / parseInt(toNano(1).toString())).toString();
+			document.getElementById("InvalidBuy")?.classList.add('hidden');
+		} catch {
+			document.getElementById("InvalidBuy")?.classList.remove('hidden');
+		}
+		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 	}
 
 	async function ConvertSell() {
-		let amount = toNano((document.getElementById("SelljUSD") as HTMLInputElement).value);
-		(document.getElementById("SellToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertSell(amount)).toString()) / parseInt(toNano(1).toString())).toString();
+		try {
+			let amount = toNano((document.getElementById("SelljUSD") as HTMLInputElement).value);
+			if (amount > toNano(Balance)) {
+				document.getElementById("InvalidSell")?.classList.remove('hidden');
+				return;
+			}
+			(document.getElementById("SellToken") as HTMLInputElement).value = (parseInt(await (await MasterStore.ConvertSell(amount)).toString()) / parseInt(toNano(1).toString())).toString();
+			document.getElementById("InvalidSell")?.classList.add('hidden');
+		} catch {
+			document.getElementById("InvalidSell")?.classList.remove('hidden');
+		}
 	}
 	
 	function SellTokens() {
-		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
-		MasterStore.Sell(tonConnectUI, cnt)
+		try {
+			let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
+			MasterStore.Sell(tonConnectUI, cnt)
+		} catch {
+
+		}
 	}
 
 	async function ButtonBuyMax() {
-		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (await MasterStore.GetBalanceUSD(tonConnectUI)).toString();
+		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (BalanceUSD).toString();
+		await ConvertBuy();
+		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 	}
 
 	function ButtonSellMax() {
-		console.log(13);
 		(document.getElementById("SelljUSD") as HTMLInputElement).value = Balance.toString();
+		(document.getElementById("SellToken") as HTMLInputElement).value = (parseInt(Balance.toString()) * OneToken).toString();
 	}
 	
 	return (
@@ -134,7 +170,7 @@ function Main() {
 					
 				</div>
 				<div className={styles.Buttons}>
-					<div onClick={!BuyMax ? () => setModalBuy(!ModalBuy) : () => setModalBuy(ModalBuy)} className={classNames(styles.cursor_pointer, (!BuyMax ? styles.ButtonsBuy : styles.ButtonsBuy2))}><p>Buy</p></div>
+					<div onClick={!BuyMax ? () => (setModalBuy(!ModalBuy), Refer()) : () => (setModalBuy(ModalBuy), Refer())} className={classNames(styles.cursor_pointer, (!BuyMax ? styles.ButtonsBuy : styles.ButtonsBuy2))}><p>Buy</p></div>
 					<div onClick={() => setModalSell(!ModalSell)} className={classNames(styles.cursor_pointer, styles.ButtonsSell)}><p>Sell</p></div>
 				</div>
 			</div>
@@ -158,6 +194,7 @@ function Main() {
 							<input onChange={ConvertBuy} id='BuyjUSD' type="text" className={styles.ModalBuyBlockInput_Input} />
 							<h1 onClick={ButtonBuyMax} className={styles.ButtonMax}>max</h1>
 						</div>
+						<h1 id="InvalidBuy" className={classNames(styles.InvalidNumber, 'hidden')}>Invalid number</h1>
 						<div className={styles.ModalBuyBlockInput}>
 							<h1 className={styles.ModalBuyBlockInput_Title}>Token</h1>
 							<input id='BuyToken' disabled type="text" className={styles.ModalBuyBlockInput_Input} />
@@ -183,6 +220,7 @@ function Main() {
 							<input onChange={ConvertSell} type="text" id='SelljUSD' className={styles.ModalSellBlockInput_Input} />
 							<h1 onClick={ButtonSellMax} className={styles.ButtonMax}>max</h1>
 						</div>
+						<h1 id="InvalidSell" className={classNames(styles.InvalidNumber, 'hidden')}>Invalid number</h1>
 						<div className={styles.ModalSellBlockInput}>
 							<h1 className={styles.ModalSellBlockInput_Title}>jUSD</h1>
 							<input type="text" id='SellToken' disabled className={styles.ModalSellBlockInput_Input} />

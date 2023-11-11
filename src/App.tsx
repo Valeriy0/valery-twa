@@ -8,6 +8,7 @@ import MasterStore from './store/master/master';
 import { toNano } from '@ton/core'
 import '@twa-dev/sdk';
 import './App.css'
+import classNames from 'classNames'
 import { Instruction, Rocket } from './assets'
 
 declare global {
@@ -46,21 +47,22 @@ function App() {
 	async function GetToken() {
 		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
 		localStorage["OneToken"] = await OneToken;
+		document.getElementsByClassName(styles.Ticker)[0].classList.remove('hidden');
 	}  
 
   return (
     <>
-      <Marquee className={styles.Ticker}>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-				<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-			</Marquee>
-      <Main />  
-      <Partners />
-      <About />
+      	<Marquee className={classNames(styles.Ticker, 'hidden')}>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+			<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
+		</Marquee>
+		<Main />  
+		<Partners />
+		<About />
     </>
   )
 }

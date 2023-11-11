@@ -97,7 +97,7 @@ class MasterStore {
 		})
 	}
 
-	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address, amount: bigint) => {
+	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address) => {
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
@@ -107,7 +107,6 @@ class MasterStore {
 			query_id: 1n,
 			referer_address: referAddress,
 		});
-		await this.Buy(tonConnectUI, amount);
 	}
 
 	GetLimit = async (tonConnectUI: TonConnectUI) => {
@@ -119,7 +118,7 @@ class MasterStore {
 		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
 		const HelperContact = client.open(await MasterContact.getHelper(Address.parse(tonConnectUI.account?.address)));
 		const Limit = await HelperContact.getBuyLimits();
-		return Limit;
+		return Limit + toNano(7n);
 	}
 
 	GetPartners = async (tonConnectUI: TonConnectUI) => {
