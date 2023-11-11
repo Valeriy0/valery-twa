@@ -47,9 +47,9 @@ function Main() {
 	async function FindAllInformation() {
 		if (!Can) return;
 		setCan(false);
-		console.log("АДРЕС", tonConnectUI.account?.address);
-		setBuyMaxLimit((await MasterStore.MaxBuyLimit(tonConnectUI)));
-		localStorage["BuyMaxLimit"] = await BuyMaxLimit;
+		const TempBuyMaxLimit = (await MasterStore.MaxBuyLimit(tonConnectUI));
+		setBuyMaxLimit(TempBuyMaxLimit);
+		localStorage["BuyMaxLimit"] = TempBuyMaxLimit;
 		const L = await MasterStore.GetLimit(tonConnectUI) / toNano(1);
 		setLimit(L);
 		localStorage["Limit"] = L;
@@ -58,13 +58,12 @@ function Main() {
 		} else {
 			if (typeof L == "bigint") {
 				const t = document.getElementById("GreenLine");
-				console.log("НОЫВВВ", BuyMaxLimit);
-				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BigInt(BuyMaxLimit) - L).toString()) / parseInt(BuyMaxLimit.toString()))}px;`);
+				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()))}px;`);
 			}
 		}
 	}  
 
-	function Refer() {
+	function BuyTokens() {
 		let xhr = new XMLHttpRequest();
 		xhr.open("POST", "http://127.0.0.1:3000/");
 		try {
@@ -72,18 +71,22 @@ function Main() {
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
 			xhr.onreadystatechange = function() {
 				const Adrs = xhr.responseText;
-				if (Adrs != '-1') {
-					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs))
+				if (Adrs == '-1' || Address.parse(Adrs).toString() != Adrs) {
+					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+					MasterStore.Buy(tonConnectUI, cnt)
+				} else {
+					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs), cnt)
 				}
 			}
-		} catch {}
-	}
-
-	function BuyTokens() {
-		try {
+			xhr.onerror = function() {
+				let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+				MasterStore.Buy(tonConnectUI, cnt)
+			}
+		} catch {
 			let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
-		} catch {}
+		}
 	}
 
 	async function ConvertBuy() {
@@ -116,16 +119,12 @@ function Main() {
 	}
 	
 	function SellTokens() {
-		try {
-			let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
-			MasterStore.Sell(tonConnectUI, cnt)
-		} catch {
-
-		}
+		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
+		MasterStore.Sell(tonConnectUI, cnt)
 	}
 
 	async function ButtonBuyMax() {
-		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (BalanceUSD).toString();
+		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (Math.min(parseInt(BalanceUSD.toString()), parseInt(Limit.toString()))).toString();
 		await ConvertBuy();
 		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 	}
@@ -142,7 +141,7 @@ function Main() {
 				<div className={styles.Balance}>
 					<img src={ModalBuy || ModalSell ? WalletActive : Wallet} alt="" 
 					className={ModalBuy || ModalSell ? styles.Balance_ImgActive : styles.Balance_Img} />
-					<h1 className={styles.Balance_Title}>Your balance ({tonConnectUI.account?.address.slice(0, 2)}...{tonConnectUI.account?.address.slice(-2)})</h1>
+					<h1 className={styles.Balance_Title}>Your balance ({tonConnectUI.account?.address.slice(2, 4)}...{tonConnectUI.account?.address.slice(-2)})</h1>
 					<div className={styles.Balance_Token}>
 						<img src={Token} alt="" />
 						<h1 className={styles.Balance_TokenText}>{Balance.toString()} (token name)</h1>
@@ -170,7 +169,7 @@ function Main() {
 					
 				</div>
 				<div className={styles.Buttons}>
-					<div onClick={!BuyMax ? () => (setModalBuy(!ModalBuy), Refer()) : () => (setModalBuy(ModalBuy), Refer())} className={classNames(styles.cursor_pointer, (!BuyMax ? styles.ButtonsBuy : styles.ButtonsBuy2))}><p>Buy</p></div>
+					<div onClick={!BuyMax ? () => setModalBuy(!ModalBuy) : () => setModalBuy(ModalBuy)} className={classNames(styles.cursor_pointer, (!BuyMax ? styles.ButtonsBuy : styles.ButtonsBuy2))}><p>Buy</p></div>
 					<div onClick={() => setModalSell(!ModalSell)} className={classNames(styles.cursor_pointer, styles.ButtonsSell)}><p>Sell</p></div>
 				</div>
 			</div>
@@ -187,7 +186,7 @@ function Main() {
 						<img className={styles.CancelImg} src={Cancel} alt="" />
 					</div>
 					<h1 className={styles.ModalBuyTitle}>Buy tokens</h1>
-					<h1 className={styles.ModalBuyDetail}>1 token = 100jUSD</h1>
+					<h1 className={styles.ModalBuyDetail}>1 token = {OneToken.toString()}jUSD</h1>
 					<div className={styles.ModalBuyInputs}>
 						<div className={styles.ModalBuyBlockInput}>
 							<h1 className={styles.ModalBuyBlockInput_Title}>jUSD</h1>
@@ -213,7 +212,7 @@ function Main() {
 						<img className={styles.CancelImg} src={Cancel} alt="" />
 					</div>
 					<h1 className={styles.ModalSellTitle}>Buy tokens</h1>
-					<h1 className={styles.ModalSellDetail}>1 token = 100jUSD</h1>
+					<h1 className={styles.ModalSellDetail}>1 token = {OneToken.toString()}jUSD</h1>
 					<div className={styles.ModalSellInputs}>
 						<div className={styles.ModalSellBlockInput}>
 							<h1 className={styles.ModalSellBlockInput_Title}>Token</h1>

@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 });
  
 connection.connect();
-var sql = "CREATE TABLE if not exists users (id VARCHAR(255) PRIMARY KEY, refer VARCHAR(255))";
+var sql = "CREATE TABLE if not exists users (id VARCHAR(255) PRIMARY KEY UNIQUE, refer VARCHAR(255))";
 connection.query(sql, function (err, result) {
     if (err) throw err;
     console.log("Table created");
@@ -61,23 +61,25 @@ http.createServer( (req,res)=>{
         ID += chunk.toString();
     });
 
-    req.on('end', function() { 
-        console.log(ID, 1);
-        connection.query(
-            `SELECT refer FROM users WHERE id = '${ID}'`,
-            function(err, results, fields) {
-                console.log(results)
-                try {
-                    if (results != null) {
-                        console.log(results[0].refer); 
-                        res.end(results[0].refer);
-                    }
-                    res.end("-1");
-                } catch {}
-            }
-          );
-          
-    })
-    
+    try {
+        req.on('end', function() { 
+            console.log(ID, 1);
+            connection.query(
+                `SELECT refer FROM users WHERE id = '${ID}'`,
+                function(err, results, fields) {
+                    console.log(results)
+                    try {
+                        if (results != null) {
+                            console.log(results[0].refer); 
+                            res.end(results[0].refer);
+                        } else {
+                            res.end("-1");
+                        }
+                    } catch {}
+                }
+            );
+            
+        })
+    } catch {}
     
 }).listen(3000,()=>{console.log("ok")})

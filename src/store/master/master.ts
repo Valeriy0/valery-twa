@@ -23,6 +23,15 @@ function binpow(a: bigint, n: bigint):bigint {
 	}
 }
 
+function randomIntFromInterval(min:number, max:number):number { 
+	return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function sleep(ms: number) {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
+  
+
 class MasterStore {
 	MasterAddress = "EQD0cE0tyeIgg00fVTCiLh5aC1uKMt5_RrMoTrfzwpvTLvAM"; 
 	MinterJusdAddress = "EQDjwcQzRCUSiy8Y0sIQDoIwxSqaErJdRpmzENl6YlnqcDy-";
@@ -97,16 +106,26 @@ class MasterStore {
 		})
 	}
 
-	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address) => {
+	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address, amount: bigint) => {
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
 		});
 		const MasterContact = client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
 		MasterContact.sendAddReferer(new Sender(tonConnectUI), toNano('0.06'), {
-			query_id: 1n,
+			query_id: BigInt(randomIntFromInterval(1, 1e9)),
 			referer_address: referAddress,
 		});
+		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
+		let approved = false;
+		while (!approved) {
+			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
+			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+				approved = true;
+				break;
+			}
+		}
+		await this.Buy(tonConnectUI, amount);
 	}
 
 	GetLimit = async (tonConnectUI: TonConnectUI) => {
@@ -118,7 +137,7 @@ class MasterStore {
 		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
 		const HelperContact = client.open(await MasterContact.getHelper(Address.parse(tonConnectUI.account?.address)));
 		const Limit = await HelperContact.getBuyLimits();
-		return Limit + toNano(7n);
+		return Limit;
 	}
 
 	GetPartners = async (tonConnectUI: TonConnectUI) => {
@@ -161,7 +180,6 @@ class MasterStore {
 		const Info = await MasterContact.getContractData();
 		const jettonsAmount = Info.jettonsAmount;
 		const jusdAmount = Info.jusdAmount;
-		console.log(amount, jusdAmount, jettonsAmount)
 		return amount * jusdAmount * 85n /  jettonsAmount / 100n;
 	}
 
