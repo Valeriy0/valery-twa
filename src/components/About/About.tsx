@@ -1,11 +1,15 @@
 import styles from "./About.module.scss";
 import Marquee from "react-fast-marquee";
-import { Book, Community, HomePage, Info, Instruction, PartnersImg, Rocket, Token, Wallet, Group, BookImg, Telegram, Message, Youtube, Twitter, BookActive } from '../../assets';
+import { Book, Community, HomePage, Info, Instruction, PartnersImg, Rocket, Token, Wallet, Group, BookImg, Telegram, Message, Youtube, Twitter, BookActive, Exit } from '../../assets';
 import { Link, Route, BrowserRouter, Routes } from "react-router-dom";
 import classNames from "classNames"
+import { useState } from 'react'
+import Links from '../../store/links/links';
+import { useTonConnectUI } from '@tonconnect/ui-react'
 
 
 function About() {
+	const [tonConnectUI, setOptions] = useTonConnectUI();
 
 	function CopyFunc() {
 		let text = (document.getElementById("Pdf")  as HTMLInputElement).textContent;
@@ -13,15 +17,8 @@ function About() {
 	}
 
 	return (
-		<>	
-			<Marquee className={styles.Ticker}>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-				<p className={styles.Ticker_Text}>1 tko = 18,78$</p>
-			</Marquee>
+		<div id='About' className='hidden'>	
+			<img src={Exit} alt="" className={styles.Exit} onClick={() => tonConnectUI.disconnect()} />
 			<div className={styles.CenterInfo}>
 				<div className={styles.CenterImg}>
 					<img src={BookImg} alt="" className={styles.MainImg} />
@@ -40,11 +37,11 @@ function About() {
 				</div>
 			</div>
 			<div className={styles.Footer}>
-				<Link to="/partners" className={styles.FooterButton}><img src={Community} alt="" /></Link>
-				<Link to="/" className={styles.FooterButton}><img src={HomePage} alt="" /></Link>
-				<Link to="/about" className={styles.FooterButton}><div className={styles.FooterButtonActive}><img src={BookActive} alt="" /></div></Link>
+				<div onClick={Links.GoPartners} className={styles.FooterButton}><img src={Community} alt="" /></div>
+				<div onClick={Links.GoMain} className={styles.FooterButton}><img src={HomePage} alt="" /></div>
+				<div onClick={Links.GoAbout} className={styles.FooterButton}><div className={styles.FooterButtonActive}><img src={BookActive} alt="" /></div></div>
 			</div>
-		</>
+		</div>
 	);
   }
 

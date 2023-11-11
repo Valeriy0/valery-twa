@@ -13,3 +13,7 @@
   background: #111;
   font-family: Intro Regular;
 }
+
+.hidden {
+  display: none;
+}

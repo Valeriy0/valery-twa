@@ -6,9 +6,22 @@ import { Master } from '../../wrappers/Master'
 import { JettonMinter } from '../../wrappers/JettonMinter'
 import { Helper } from '../../wrappers/Helper'
 import { Sender } from '../../wrappers/Sender';
-import { JettonWallet } from '@ton/ton';
+import { JettonWallet } from '../../wrappers/JettonWallet';
 import { Address, Cell, OpenedContract, toNano } from '@ton/core'
 import axios from 'axios';
+
+function binpow(a: bigint, n: bigint):bigint {
+	if (n == 0n){
+		return 1n;
+    }
+	if (n % 2n == 1n){
+		return binpow(a, n - 1n) * a;
+    }
+	else {
+		let b:bigint = binpow(a, n / 2n);
+		return b * b;
+	}
+}
 
 class MasterStore {
 	MasterAddress = "EQD0cE0tyeIgg00fVTCiLh5aC1uKMt5_RrMoTrfzwpvTLvAM"; 
@@ -84,7 +97,7 @@ class MasterStore {
 		})
 	}
 
-	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address) => {
+	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address, amount: bigint) => {
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
@@ -94,10 +107,11 @@ class MasterStore {
 			query_id: 1n,
 			referer_address: referAddress,
 		});
+		await this.Buy(tonConnectUI, amount);
 	}
 
 	GetLimit = async (tonConnectUI: TonConnectUI) => {
-		if (tonConnectUI.account?.address == null) return
+		if (tonConnectUI.account?.address == null) return 0n;
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
@@ -152,8 +166,8 @@ class MasterStore {
 		return amount * jusdAmount * 85n /  jettonsAmount / 100n;
 	}
 
-	MaxBuyLimit = async (tonConnectUI: TonConnectUI, amount: bigint) => {
-		if (tonConnectUI.account?.address == null) return
+	MaxBuyLimit = async (tonConnectUI: TonConnectUI) => {
+		if (tonConnectUI.account?.address == null) return 10n;
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
@@ -161,17 +175,35 @@ class MasterStore {
 		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
 		const HelperContact = client.open(await MasterContact.getHelper(Address.parse(tonConnectUI.account?.address)));
 		const Data = await HelperContact.getContractData();
-		return Data.beginTime;
+		const Now =  BigInt(Date.now()) / 1000n;
+		const current_day_index = (BigInt(Now) - Data.beginTime) / (24n * 60n * 60n);
+		return ((10000000000n * binpow(13n, current_day_index) / binpow(10n, current_day_index))) / toNano(1n);
 	}
 
-	GetBalance = async () => {
+	GetBalance = async (tonConnectUI: TonConnectUI) => {
+		if (tonConnectUI.account?.address == null) return 10n;
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
 			endpoint
 		});
-		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
-		const Data = await MasterContact.getContractData();
-		return Data.jettonsAmount;
+		const jettonMaster = client.open(JettonMaster.create(Address.parse(this.MinterCustomAddress)));
+		const jettonWallet = await jettonMaster.getWalletAddress(Address.parse(tonConnectUI.account?.address));
+		const Contact = await client.open(JettonWallet.createFromAddress(Address.parse(jettonWallet.toString())));
+		console.log("Баланс", await Contact.getJettonBalance());
+		return (await Contact.getJettonBalance()) / toNano(1);
+	}
+
+	GetBalanceUSD = async (tonConnectUI: TonConnectUI) => {
+		if (tonConnectUI.account?.address == null) return 10n;
+		const endpoint = await getHttpEndpoint(); 
+		const client = new TonClient({
+			endpoint
+		});
+		const jettonMaster = client.open(JettonMaster.create(Address.parse(this.MinterJusdAddress)));
+		const jettonWallet = await jettonMaster.getWalletAddress(Address.parse(tonConnectUI.account?.address));
+		const Contact = await client.open(JettonWallet.createFromAddress(Address.parse(jettonWallet.toString())));
+		console.log("Баланс2", await Contact.getJettonBalance());
+		return (await Contact.getJettonBalance()) / toNano(1);
 	}
 
 }

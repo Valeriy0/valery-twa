@@ -181,7 +181,6 @@
 }
 
 .GreenLine {
-	width: 114px;
 	height: 23px;
 	border-radius: 16px;
 	background: #00E217;
@@ -338,6 +337,7 @@
 	}
 
 	&BlockInput {
+		position: relative;
 		display: flex;
 		gap: 5px;
 		flex-direction: column;
@@ -416,6 +416,7 @@
 	}
 
 	&BlockInput {
+		position: relative;
 		display: flex;
 		gap: 5px;
 		flex-direction: column;
@@ -606,4 +607,22 @@ input, input:active, input:hover, input:focus {
 
 .cursor_pointer {
 	cursor: pointer;
+}
+
+.Exit {
+	position: absolute;
+	top: 31px;
+	right: 9px;
+}
+
+.ButtonMax {
+	position: absolute;
+	bottom: 13px;
+	right: 22px;
+	color: #FFF;
+	text-align: center;
+	font-size: 16px;
+	font-style: normal;
+	font-weight: 600;
+	line-height: normal;
 }

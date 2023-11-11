@@ -11,9 +11,7 @@ import { HashRouter as Router } from "react-router-dom";
 const manifestUrl = 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <Router>
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
-      <App />
-    </TonConnectUIProvider>
-  </Router>,
+  <TonConnectUIProvider manifestUrl={manifestUrl}>
+    <App />
+  </TonConnectUIProvider>
 )

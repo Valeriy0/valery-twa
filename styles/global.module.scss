@@ -2,3 +2,123 @@
 	color: white;
 	font-size: 14px;
 }
+
+.Ticker {
+	border: 1px solid #1F344C;
+	background: #171B22;
+	height: 20px;
+	align-items: center;
+	vertical-align: middle;
+	&_Text {
+		margin-right: 30px;
+		color: #627282;
+		font-size: 12px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+}
+
+.Main {
+	overflow-x: hidden;
+	position: relative;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	gap: 73px;
+	@media (min-width: 768px) {
+		justify-content: space-around;
+		gap: 0px;
+	}
+}
+
+.ConnectTon {
+	display: flex;
+	flex-direction: column;
+	gap: 23px;
+}
+
+.Rocket {
+	width: 244px;
+	height: 287px;
+	margin-top: 109px;
+	margin-left: auto;
+	margin-right: auto;
+	@media (min-width: 768px) {
+		margin-top: 0px;
+	}
+}
+
+.Instruction {
+	display: flex;
+	gap: 0px;
+	margin-left: auto;
+	margin-right: auto;
+
+	&__Title {
+		margin-top: auto;
+		margin-bottom: auto;
+		height: auto;
+		color: #7B7B7B;
+		font-size: 18px;
+		font-style: normal;
+		font-weight: 400;
+		line-height: normal;
+	}
+}
+
+
+.tonConnectBtn {
+	width: max-content;
+	margin-left: auto;
+	margin-right: auto;
+	&__btn {
+		div {
+			tc-root {
+				button {
+					padding-left: 81px;
+					padding-right: 81px;
+					padding-top: 28px;
+					padding-bottom: 28px;
+					height: 48px;
+					background-color: #0088CB;
+					border-radius: 12px;
+					display: flex;
+					align-items: center;
+					transition: 0.15s ease-out;
+					svg {
+						display: none;
+					}
+					div {
+						font-family: 'Intro Regular';
+						font-style: normal;
+						font-weight: 400;
+						font-size: 18px;
+						line-height: normal;
+						white-space: nowrap;
+					}
+					&:hover {
+					transform: none;
+					background-color: #00A1F0;
+					}
+					&:active {
+					background-color: #0177B0;
+					}
+				}
+			}
+		}
+		@media (max-width: 600px) {
+			div {
+				tc-root {
+					button {
+						height: 40px;
+						padding-left: 81px;
+						padding-right: 81px;
+						padding-top: 28px;
+						padding-bottom: 28px;
+					}
+				}
+			}
+		}
+	}
+}

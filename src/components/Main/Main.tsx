@@ -1,5 +1,5 @@
-import { TonConnectButton } from '@tonconnect/ui-react';
-import { Arrow, Book, Cancel, Circle, Community, HomePage, HomePageActive, Info, Instruction, Rocket, Token, Wallet, WalletActive } from '../../assets';
+import { TonConnectButton, useIsConnectionRestored, useTonAddress } from '@tonconnect/ui-react';
+import { Arrow, Book, Cancel, Circle, Community, Exit, HomePage, HomePageActive, Info, Instruction, Rocket, Token, Wallet, WalletActive } from '../../assets';
 import styles from "./Main.module.scss";
 import Marquee from "react-fast-marquee";
 import { useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
@@ -7,62 +7,72 @@ import { Link, Route, BrowserRouter, Routes } from "react-router-dom";
 import { Address, toNano } from '@ton/core'
 import { useEffect, useState } from 'react'
 import MasterStore from "../../store/master/master"
+import Links from '../../store/links/links';
 import classNames from "classNames"
-
-function Connect() {
-  return (
-    <div className={styles.Main}>
-		<img src={Rocket} alt="" className={styles.Rocket} />
-		<div className={styles.ConnectTon}>
-			<div className={styles.tonConnectBtn}>
-				<TonConnectButton className={styles.tonConnectBtn__btn} />
-			</div>
-			<div  className={styles.Instruction}>
-				<img src={Instruction} alt="" />
-				<h1 className={styles.Instruction__Title}>Instruction</h1>
-			</div>
-		</div>
-	</div>
-  );
-}
-
-async function GetToken() {
-	const TOKEN = await MasterStore.TakeInfoToken();
-	const SYMBOL = TOKEN.data.metadata.symbol;
-	return Symbol;
-}
 
 function Main() {
 	const [ModalBuy, setModalBuy] = useState(false);
+	const userFriendlyAddress = useTonAddress();
 	const [ModalSell, setModalSell] = useState(false);
 	const [OneToken, setOneToken] = useState(localStorage['OneToken'] == null ? 0.1 : localStorage['OneToken']);
-	const [Balance, setBalance] = useState(0n);
+	const [Balance, setBalance] = useState(localStorage['Balance'] == null ? 0n : localStorage['Balance']);
 	const [ModalBuyLimit, setModalBuyLimit] = useState(false);
 	const [BuyMax, setBuyMax] = useState(false);
-	const wallet = useTonWallet();
+	const [BuyMaxLimit, setBuyMaxLimit] = useState(localStorage['BuyMaxLimit'] == null ? 10n : localStorage['BuyMaxLimit']);
 	const [tonConnectUI, setOptions] = useTonConnectUI();
-	const [Limit, setLimit] = useState(localStorage['BuyLimit'] == null ? 10n : localStorage['BuyLimit']);
+	tonConnectUI.setConnectRequestParameters(null);
+	const [Limit, setLimit] = useState(localStorage['Limit'] == null ? 1n : localStorage['Limit']);
+	const [Can, setCan] = useState(true);
+	const connectionRestored = useIsConnectionRestored();
+	
 	window.Telegram.WebApp.ready();
-	useEffect(() => {
-		console.log(tonConnectUI.account?.address);
-		async function datesInit() {
-			setBalance(await MasterStore.GetBalance());
-			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-			localStorage['OneToken'] = OneToken;
-			const L = await MasterStore.GetLimit(tonConnectUI);
-			console.log(12, L);
-			if (L != null) {
-				localStorage['BuyLimit'] = L / toNano(1);
-				setLimit(L / toNano(1));
+	console.log("232LLLL", Limit, BuyMaxLimit);
+	const GreenWidth = 295 * 1;
+	if (tonConnectUI.account?.address != null) {FindAllInformation();}
+
+	async function FindAllInformation() {
+		if (!Can) return;
+		setCan(false);
+		console.log("АДРЕС", tonConnectUI.account?.address);
+		setBalance(await MasterStore.GetBalance(tonConnectUI));
+		localStorage["Balance"] = await Balance;
+		setBuyMaxLimit((await MasterStore.MaxBuyLimit(tonConnectUI)));
+		localStorage["BuyMaxLimit"] = await BuyMaxLimit;
+		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+		localStorage["OneToken"] = await OneToken;
+		const L = await MasterStore.GetLimit(tonConnectUI) / toNano(1);
+		setLimit(L);
+		localStorage["Limit"] = L;
+		if (L == 0n) {
+			setBuyMax(true);
+		} else {
+			if (typeof L == "bigint") {
+				const t = document.getElementById("GreenLine");
+				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BuyMaxLimit - L).toString()) / parseInt(BuyMaxLimit.toString()))}px;`);
 			}
-		  }
-		  
-		  datesInit();
-	  }, [])
+		}
+	}  
 
 	function BuyTokens() {
-		let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-		MasterStore.Buy(tonConnectUI, cnt)
+		let xhr = new XMLHttpRequest();
+		xhr.open("POST", "http://127.0.0.1:3000/");
+		try {
+			// xhr.send("1191496245");
+			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
+			xhr.onreadystatechange = function() {
+				const Adrs = xhr.responseText;
+				if (Adrs == '-1') {
+					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+					MasterStore.Buy(tonConnectUI, cnt)
+				} else {
+					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs), cnt)
+				}
+			}
+		} catch {
+			let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+			MasterStore.Buy(tonConnectUI, cnt)
+		}
 	}
 
 	async function ConvertBuy() {
@@ -79,32 +89,29 @@ function Main() {
 		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
 		MasterStore.Sell(tonConnectUI, cnt)
 	}
-	
-	
-	if (wallet == null) {
-		return Connect();
-	}
-	return (
-		<>
-			<div>
-				<Marquee className={styles.Ticker}>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
-					<p className={styles.Ticker_Text}>1 tko = {OneToken.toString()}$</p>
 
-				</Marquee>
+	async function ButtonBuyMax() {
+		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (await MasterStore.GetBalanceUSD(tonConnectUI)).toString();
+	}
+
+	function ButtonSellMax() {
+		console.log(13);
+		(document.getElementById("SelljUSD") as HTMLInputElement).value = Balance.toString();
+	}
+	
+	return (
+		<div id='Main' className=''>
+			<div>
+				<img src={Exit} alt="" className={styles.Exit} onClick={() => tonConnectUI.disconnect()} />
 				<div className={styles.Balance}>
 					<img src={ModalBuy || ModalSell ? WalletActive : Wallet} alt="" 
 					className={ModalBuy || ModalSell ? styles.Balance_ImgActive : styles.Balance_Img} />
-					<h1 className={styles.Balance_Title}>Your balance</h1> 
+					<h1 className={styles.Balance_Title}>Your balance ({tonConnectUI.account?.address.slice(0, 2)}...{tonConnectUI.account?.address.slice(-2)})</h1>
 					<div className={styles.Balance_Token}>
 						<img src={Token} alt="" />
-						<h1 className={styles.Balance_TokenText}>1000 (token name)</h1>
+						<h1 className={styles.Balance_TokenText}>{Balance.toString()} (token name)</h1>
 					</div>
-					<h1 className={styles.Balance_USD}>~1000 jUSD</h1>
+					<h1 className={styles.Balance_USD}>~{(parseInt(Balance.toString()) * OneToken).toString()} jUSD</h1>
 				</div>
 				<div className={styles.BuyLimit}>
 					<div onClick={() => setModalBuyLimit(!ModalBuyLimit)} className={classNames(styles.cursor_pointer, styles.BuyLimit_Title)}>
@@ -114,14 +121,14 @@ function Main() {
 					<div className={styles.Line}>
 						<div className={styles.Line__Nums}>
 							<h1 className={styles.Line__NumsText}>0</h1>
-							<h1 className={styles.Line__NumsText}>{Limit.toString()}</h1>
+							<h1 id="BuyMaxLimit" className={styles.Line__NumsText}>{BuyMaxLimit.toString()}</h1>
 						</div>
 						<div className={styles.LineHow}>
-							<div className={styles.GreenLine}></div>
+							<div style={{ width: GreenWidth }} id="GreenLine" className={styles.GreenLine}></div>
 						</div>
 					</div>
 					{!BuyMax ?
-					<h1 className={styles.MaxBuy}>Max buy 200 jUSD</h1>
+					<h1 className={styles.MaxBuy}>Max buy {BuyMaxLimit.toString()} jUSD</h1>
 					: <h1 className={styles.MaxBuy2}>Invite new partners<br/>or await new day limit</h1>
 					}
 					
@@ -132,9 +139,9 @@ function Main() {
 				</div>
 			</div>
 			<div className={styles.Footer}>
-				<Link to="/partners" className={styles.FooterButton}><img src={Community} alt="" /></Link>
-				<Link to="/" className={styles.FooterButton}><div className={styles.FooterButtonActive}><img src={HomePageActive} alt="" /></div></Link>
-				<Link to="/about" className={styles.FooterButton}><img src={Book} alt="" /></Link>
+				<div onClick={Links.GoPartners} className={styles.FooterButton}><img src={Community} alt="" /></div>
+				<div onClick={Links.GoMain} className={styles.FooterButton}><div className={styles.FooterButtonActive}><img src={HomePageActive} alt="" /></div></div>
+				<div onClick={Links.GoAbout} className={styles.FooterButton}><img src={Book} alt="" /></div>
 			</div>
 			{ModalBuy ? 
 			<div onClick={() => setModalBuy(!ModalBuy)} className={styles.BlackWindow}>
@@ -149,6 +156,7 @@ function Main() {
 						<div className={styles.ModalBuyBlockInput}>
 							<h1 className={styles.ModalBuyBlockInput_Title}>jUSD</h1>
 							<input onChange={ConvertBuy} id='BuyjUSD' type="text" className={styles.ModalBuyBlockInput_Input} />
+							<h1 onClick={ButtonBuyMax} className={styles.ButtonMax}>max</h1>
 						</div>
 						<div className={styles.ModalBuyBlockInput}>
 							<h1 className={styles.ModalBuyBlockInput_Title}>Token</h1>
@@ -173,6 +181,7 @@ function Main() {
 						<div className={styles.ModalSellBlockInput}>
 							<h1 className={styles.ModalSellBlockInput_Title}>Token</h1>
 							<input onChange={ConvertSell} type="text" id='SelljUSD' className={styles.ModalSellBlockInput_Input} />
+							<h1 onClick={ButtonSellMax} className={styles.ButtonMax}>max</h1>
 						</div>
 						<div className={styles.ModalSellBlockInput}>
 							<h1 className={styles.ModalSellBlockInput_Title}>jUSD</h1>
@@ -197,7 +206,7 @@ function Main() {
 				</div>
 			</div> 
 			: ""}
-		</>
+		</div>
 	);
   }
 

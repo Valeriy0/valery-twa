@@ -16,6 +16,7 @@ import Telegram from "./logo/telegram.svg"
 import Twitter from "./logo/twitter.svg"
 import Circle from "./logo/circle.svg"
 import Cancel from "./logo/cancel.svg"
+import Exit from "./logo/exit.svg"
 import Youtube from "./logo/youtube.svg"
 import HomePageActive from "./logo/homeActive.png"
 import CommunityActive from "./logo/communityActive.png"
@@ -45,4 +46,5 @@ export {
 	Book,
 	Group,
 	Arrow,
+	Exit,
 }
