@@ -41,7 +41,9 @@ function Partners() {
 		let text = (document.getElementById("Link")  as HTMLInputElement).textContent;
 		navigator.clipboard.writeText(text ? text : "");
 		setCopyText(true);
-		setTimeout(() => setCopyText(false), 2000);
+		setTimeout(() => (document.getElementById("BlockCopy") as HTMLDivElement).setAttribute('style', `transition: transform 0.7s; transform: translateX(-102px);`), 300);
+		setTimeout(() => (document.getElementById("BlockCopy") as HTMLDivElement).setAttribute('style', `transition: transform 0.7s; transform: translateX(102px);`), 1700);
+		setTimeout(() => setCopyText(false), 2500);
 	}
 
 	return (
@@ -68,7 +70,7 @@ function Partners() {
 				<h1 id="Link" className={styles.RefferalLink_Link}>https://t.me/tgminiapp_bot?start={tonConnectUI.account?.address.slice(2)}</h1>
 				<div onClick={CopyFunc} className={classNames(styles.cursor_pointer, styles.RefferalLink_Button)}><p className={styles.RefferalLink_Button_Title}>Copy</p></div>
 			</div>
-			{CopyText ? <h1 className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
+			{CopyText ? <h1 id="BlockCopy" className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
 		</div>
 	);
   }

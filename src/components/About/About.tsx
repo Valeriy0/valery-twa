@@ -16,7 +16,9 @@ function About() {
 		let text = (document.getElementById("Pdf")  as HTMLInputElement).textContent;
 		navigator.clipboard.writeText(text ? text : "");
 		setCopyText(true);
-		setTimeout(() => setCopyText(false), 2000);
+		setTimeout(() => (document.getElementById("BlockCopyAbout") as HTMLDivElement).setAttribute('style', `transition: transform 0.7s; transform: translateX(-102px);`), 300);
+		setTimeout(() => (document.getElementById("BlockCopyAbout") as HTMLDivElement).setAttribute('style', `transition: transform 0.7s; transform: translateX(102px);`), 1700);
+		setTimeout(() => setCopyText(false), 2500);
 	}
 
 	return (
@@ -44,7 +46,7 @@ function About() {
 				<div onClick={Links.GoMain} className={styles.FooterButton}><img src={HomePage} alt="" /></div>
 				<div onClick={Links.GoAbout} className={styles.FooterButton}><div className={styles.FooterButtonActive}><img src={BookActive} alt="" /></div></div>
 			</div>
-			{CopyText ? <h1 className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
+			{CopyText ? <h1 id="BlockCopyAbout" className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
 		</div>
 	);
   }
