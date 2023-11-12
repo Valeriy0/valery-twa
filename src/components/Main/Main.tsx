@@ -62,6 +62,12 @@ function Main() {
 				}
 			}
 		}
+		setBalance(await MasterStore.GetBalance(tonConnectUI));
+		localStorage["Balance"] = await Balance;
+		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+		localStorage["OneToken"] = await OneToken;
+		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
+		localStorage["BalanceUSD"] = await BalanceUSD;
 	}
 
 	async function FindAllInformation() {
