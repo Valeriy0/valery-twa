@@ -58,7 +58,7 @@ function Main() {
 				const t = document.getElementById("GreenLine");
 				const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
 				if (t != null) {
-					t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 2s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
+					t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 0.8s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
 				}
 			}
 		}
