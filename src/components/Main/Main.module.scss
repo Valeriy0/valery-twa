@@ -173,6 +173,7 @@
 	}
 
 	&How {
+		position: relative;
 		width: 295px;
 		height: 25px;
 		border-radius: 16px;
@@ -181,6 +182,7 @@
 }
 
 .GreenLine {
+	width: 0px;
 	height: 23px;
 	border-radius: 16px;
 	background: #00E217;

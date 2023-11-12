@@ -19,6 +19,7 @@ function Main() {
 	const [BalanceUSD, setBalanceUSD] = useState(localStorage['BalanceUSD'] == null ? 0n : localStorage['BalanceUSD']);
 	const [ModalBuyLimit, setModalBuyLimit] = useState(false);
 	const [BuyMax, setBuyMax] = useState(false);
+	const [AppearGreen, setAppearGreen] = useState(localStorage['AppearGreen'] == null ? false : localStorage['AppearGreen']);
 	const [BuyMaxLimit, setBuyMaxLimit] = useState(localStorage['BuyMaxLimit'] == null ? 10n : localStorage['BuyMaxLimit']);
 	const [tonConnectUI, setOptions] = useTonConnectUI();
 	tonConnectUI.setConnectRequestParameters(null);
@@ -27,8 +28,6 @@ function Main() {
 	const connectionRestored = useIsConnectionRestored();
 	
 	window.Telegram.WebApp.ready();
-	console.log("232LLLL", Limit, BuyMaxLimit);
-	const GreenWidth = 295 * 295 * (parseInt((BigInt(BuyMaxLimit) - BigInt(Limit)).toString()) / parseInt(BuyMaxLimit.toString()));
 	if (tonConnectUI.account?.address != null) {FindAllInformation();}
 
 	useEffect(() => {
@@ -57,7 +56,10 @@ function Main() {
 		} else {
 			if (typeof L == "bigint") {
 				const t = document.getElementById("GreenLine");
-				if (t != null) t.setAttribute('style', `width: ${295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()))}px;`);
+				const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
+				if (t != null) {
+					t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 2s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
+				}
 			}
 		}
 	}
@@ -164,7 +166,7 @@ function Main() {
 							<h1 id="BuyMaxLimit" className={styles.Line__NumsText}>{BuyMaxLimit.toString()}</h1>
 						</div>
 						<div className={styles.LineHow}>
-							<div style={{ width: GreenWidth }} id="GreenLine" className={styles.GreenLine}></div>
+							<div id="GreenLine" className={styles.GreenLine}></div>
 						</div>
 					</div>
 					{!BuyMax ?
