@@ -38,22 +38,24 @@ export class Helper implements Contract {
     }
 
     async getContractData(provider: ContractProvider): Promise<{
-        masterAddress: Cell;
-        refererAddress: Cell;
-        userAddress: Cell;
+        masterAddress: Address;
+        refererAddress: Address;
+        userAddress: Address;
         beginTime: bigint;
         lastDayIndex: bigint;
         lastDayAmount: bigint;
+        helperCode: Cell;
         referalsCount: number;
     }> {
         const res = (await provider.get('get_contract_data', [])).stack;
         return {
-            masterAddress: res.readCell(),
-            refererAddress: res.readCell(),
-            userAddress: res.readCell(),
+            masterAddress: res.readAddress(),
+            refererAddress: res.readAddress(),
+            userAddress: res.readAddress(),
             beginTime: res.readBigNumber(),
             lastDayIndex: res.readBigNumber(),
             lastDayAmount: res.readBigNumber(),
+            helperCode: res.readCell(),
             referalsCount: res.readNumber(),
         };
     }

@@ -33,9 +33,9 @@ function sleep(ms: number) {
   
 
 class MasterStore {
-	MasterAddress = "EQD0cE0tyeIgg00fVTCiLh5aC1uKMt5_RrMoTrfzwpvTLvAM"; 
+	MasterAddress = "EQCDSxqIWdChwZNaI8DoWno9T5t3mPGqyyV23CPWR4qIuifJ"; 
 	MinterJusdAddress = "EQDjwcQzRCUSiy8Y0sIQDoIwxSqaErJdRpmzENl6YlnqcDy-";
-	MinterCustomAddress = "EQBWAHbpSrSGoAb2rd21B9lofgvl_eT5kkqtYAYWMdxs_dVT"; 
+	MinterCustomAddress = "EQCSwg3O44ZYVQE8XGTv00-Hp2Ph7N45F_WfK8dWqqXKa13Q"; 
 	client: TonClient | null = null;
 
     constructor() {
@@ -74,6 +74,40 @@ class MasterStore {
 		})
 	}
 
+	BuyRefer = async (tonConnectUI: TonConnectUI, amount: bigint, refer: Address) => {
+		if (tonConnectUI.account?.address == null) return;
+		const body = beginCell()
+        .storeUint(0xf8a7ea5, 32)         
+        .storeUint(0, 64)                       
+        .storeCoins(toNano(amount)) // amount                
+        .storeAddress(Address.parse(this.MasterAddress))                 
+        .storeAddress(Address.parse(tonConnectUI.account.address))             
+        .storeUint(0, 1)                      
+        .storeCoins(toNano(0.3))               
+        .storeUint(1,1)
+		.storeRef(beginCell().storeAddress(refer).endCell())                        
+        .endCell();
+		const endpoint = await getHttpEndpoint(); 
+		this.client = new TonClient({
+			endpoint
+		});
+		const jettonMasterAddress = Address.parse(this.MinterJusdAddress) // token
+		const userAddress = Address.parse(tonConnectUI.account.address)
+		const jettonMaster = this.client.open(JettonMaster.create(jettonMasterAddress))
+		const jettonWallet = await jettonMaster.getWalletAddress(userAddress);
+		await tonConnectUI.sendTransaction({
+			messages: [
+				{
+					address: jettonWallet.toString(), // this.Master.address.toString()
+					amount: toNano(1).toString(),
+					payload: body.toBoc().toString("base64"),
+
+				},
+			],
+			validUntil: Date.now() + 5 * 60 * 1000
+		})
+	}
+
 	Sell = async (tonConnectUI: TonConnectUI, amount: bigint) => {
 		if (tonConnectUI.account?.address == null) return;
 		const body = beginCell()
@@ -104,28 +138,6 @@ class MasterStore {
 			],
 			validUntil: Date.now() + 5 * 60 * 1000
 		})
-	}
-
-	AddRefer = async (tonConnectUI: TonConnectUI, referAddress: Address, amount: bigint) => {
-		const endpoint = await getHttpEndpoint(); 
-		const client = new TonClient({
-			endpoint
-		});
-		const MasterContact = client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
-		MasterContact.sendAddReferer(new Sender(tonConnectUI), toNano('0.06'), {
-			query_id: BigInt(randomIntFromInterval(1, 1e9)),
-			referer_address: referAddress,
-		});
-		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
-		let approved = false;
-		while (!approved) {
-			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
-			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
-				approved = true;
-				break;
-			}
-		}
-		await this.Buy(tonConnectUI, amount);
 	}
 
 	GetLimit = async (tonConnectUI: TonConnectUI) => {

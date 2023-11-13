@@ -89,6 +89,13 @@
 	border-radius: 10px;
 	background: #1F2734;
 
+	&_Group {
+		display: flex;
+		gap: 10px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
 	&_Title {
 		margin-top: 22px;
 		color: #2591F5;
@@ -112,11 +119,16 @@
 		line-height: normal;
 	}
 
+	&_Buttons {
+		display: flex;
+		gap: 0px;
+	}
+
 	&_Button {
 		margin-top: 21px;
 		margin-left: auto;
 		margin-right: auto;
-		width: 295px;
+		width: 150px;
 		height: 50px;
 		border-radius: 8px;
 		background: #2591F5;
@@ -200,4 +212,12 @@
 		margin-top: 4px;
 		margin-bottom: 4px;
 	}
+}
+
+.Share {
+	width: 18px;
+}
+
+a {
+	text-decoration: none;
 }

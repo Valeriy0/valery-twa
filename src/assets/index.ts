@@ -15,6 +15,7 @@ import Message from "./logo/message.svg"
 import Telegram from "./logo/telegram.svg"
 import Twitter from "./logo/twitter.svg"
 import Circle from "./logo/circle.svg"
+import Share from "./logo/share.svg"
 import Cancel from "./logo/cancel.svg"
 import Exit from "./logo/exit.svg"
 import Youtube from "./logo/youtube.svg"
@@ -37,6 +38,7 @@ export {
 	PartnersImg,
 	BookImg,
 	Wallet,
+	Share,
 	WalletActive,
 	Token,
 	Info,

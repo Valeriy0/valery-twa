@@ -13,6 +13,7 @@ export function masterConfigToCell(config: MasterConfig): Cell {
         .storeRef(config.helperCode)
         .storeRef(beginCell().storeAddress(config.ownerAddress).storeUint(0, 4).endCell())
         .storeUint(0, 2)
+        .storeUint(0, 48)
         .storeCoins(config.jettonsAmount)
         .storeCoins(config.jusdAmount)
         .endCell();
@@ -21,6 +22,7 @@ export function masterConfigToCell(config: MasterConfig): Cell {
 export const Opcodes = {
     addReferer: 0x33ae6648,
     setData: 0x2b339c13,
+    setCodes: 0x3c089b25,
 };
 
 export class Master implements Contract {
@@ -44,15 +46,40 @@ export class Master implements Contract {
         });
     }
 
+    async sendSetCodes(
+        provider: ContractProvider,
+        via: Sender,
+        value: bigint,
+        opts: {
+            query_id: bigint;
+            master_code?: Cell;
+            helper_code?: Cell;
+        }
+    ) {
+        await provider.internal(via, {
+            value,
+            sendMode: SendMode.PAY_GAS_SEPARATELY,
+            body: beginCell()
+                .storeUint(Opcodes.setCodes, 32)
+                .storeUint(opts.query_id, 64)
+                .storeMaybeRef(opts.master_code)
+                .storeMaybeRef(opts.helper_code)
+                .endCell(),
+        });
+    }
+
     async sendSetData(
         provider: ContractProvider,
         via: Sender,
         value: bigint,
         opts: {
             query_id: bigint;
-            minter_address: Address;
-            jetton_wallet_address: Address;
-            jusd_wallet_address: Address;
+            minter_address?: Address;
+            jetton_wallet_address?: Address;
+            jusd_wallet_address?: Address;
+            first_referal_percent?: bigint;
+            second_referal_percent?: bigint;
+            third_referal_percent?: bigint;
         }
     ) {
         await provider.internal(via, {
@@ -61,34 +88,20 @@ export class Master implements Contract {
             body: beginCell()
                 .storeUint(Opcodes.setData, 32)
                 .storeUint(opts.query_id, 64)
-                .storeAddress(opts.minter_address)
-                .storeAddress(opts.jetton_wallet_address)
-                .storeAddress(opts.jusd_wallet_address)
-                .endCell(),
-        });
-    }
-
-    async sendAddReferer(
-        provider: ContractProvider,
-        via: Sender,
-        value: bigint,
-        opts: {
-            query_id: bigint;
-            referer_address: Address;
-        }
-    ) {
-        await provider.internal(via, {
-            value,
-            sendMode: SendMode.PAY_GAS_SEPARATELY,
-            body: beginCell()
-                .storeUint(Opcodes.addReferer, 32)
-                .storeUint(opts.query_id, 64)
-                .storeAddress(opts.referer_address)
+                .storeMaybeBuilder(opts.minter_address ? beginCell().storeAddress(opts.minter_address) : null)
+                .storeMaybeBuilder(
+                    opts.jetton_wallet_address ? beginCell().storeAddress(opts.jetton_wallet_address) : null
+                )
+                .storeMaybeBuilder(opts.jusd_wallet_address ? beginCell().storeAddress(opts.jusd_wallet_address) : null)
+                .storeMaybeUint(opts.first_referal_percent, 16)
+                .storeMaybeUint(opts.second_referal_percent, 16)
+                .storeMaybeUint(opts.third_referal_percent, 16)
                 .endCell(),
         });
     }
 
     async getContractData(provider: ContractProvider): Promise<{
+        helperCode: Cell;
         ownerAddress: Address;
         minterAddress: Address;
         jettonWalletAddress: Address;
@@ -97,8 +110,8 @@ export class Master implements Contract {
         jusdAmount: bigint;
     }> {
         const res = (await provider.get('get_contract_data', [])).stack;
-        res.skip(1);
         return {
+            helperCode: res.readCell(),
             ownerAddress: res.readAddress(),
             minterAddress: res.readAddress(),
             jettonWalletAddress: res.readAddress(),

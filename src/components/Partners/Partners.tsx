@@ -68,7 +68,10 @@ function Partners() {
 			<div className={styles.RefferalLink}>
 				<h1 className={styles.RefferalLink_Title}>Refferal link</h1>
 				<h1 id="Link" className={styles.RefferalLink_Link}>https://t.me/tgminiapp_bot?start={tonConnectUI.account?.address.slice(2)}</h1>
-				<div onClick={CopyFunc} className={classNames(styles.cursor_pointer, styles.RefferalLink_Button)}><p className={styles.RefferalLink_Button_Title}>Copy</p></div>
+				<div className={styles.RefferalLink_Buttons}>
+					<div onClick={CopyFunc} className={classNames(styles.cursor_pointer, styles.RefferalLink_Button)}><p className={styles.RefferalLink_Button_Title}>Copy</p></div>
+					<a href={`https://telegram.me/share/url?url=https://t.me/tgminiapp_bot?start=${tonConnectUI.account?.address.slice(2)}`} className={classNames(styles.cursor_pointer, styles.RefferalLink_Button)}><p className={styles.RefferalLink_Button_Title}>Share</p></a>
+				</div>
 			</div>
 			{CopyText ? <h1 id="BlockCopy" className={styles.BlockCopy}><p className={styles.BlockCopyText}>Copied</p></h1> : ""}
 		</div>

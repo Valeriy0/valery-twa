@@ -89,7 +89,7 @@ function Main() {
 					MasterStore.Buy(tonConnectUI, cnt)
 				} else {
 					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-					MasterStore.AddRefer(tonConnectUI, Address.parse(Adrs), cnt)
+					MasterStore.BuyRefer(tonConnectUI, cnt, Address.parse(Adrs))
 				}
 			}
 			xhr.onerror = function() {
