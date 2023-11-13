@@ -35,12 +35,22 @@ bot.onText(/\/start/, async msg => {
         if(msg.text.length > 6) {
             const refID = "0:" + msg.text.slice(7);
             await bot.sendMessage(msg.chat.id, `Вы зашли по ссылке пользователя с адресом ${refID}`);
-            const sql = `INSERT INTO usersDB (id, refer) VALUES ('${msg.from.id.toString()}', '${refID}')`;
-            console.log(msg.from.id.toString());
-            connection.query(sql, function (err, result) {
-                if (err) throw err;
-                console.log("ADD");
-            });                
+            connection.query(
+                `SELECT refer FROM usersDB WHERE id = '${msg.from.id.toString()}'`,
+                function(err, results, fields) {
+                    console.log(results)
+                    try {
+                        if (results == null || results.length == 0) {
+                            const sql = `INSERT INTO usersDB (id, refer) VALUES ('${msg.from.id.toString()}', '${refID}')`;
+                            console.log(msg.from.id.toString());
+                            connection.query(sql, function (err, result) {
+                                if (err) throw err;
+                                console.log("ADD");
+                            }); 
+                        }
+                    } catch {}
+                }
+            );               
         }
     }
     catch(error) {
