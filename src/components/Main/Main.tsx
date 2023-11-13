@@ -89,7 +89,7 @@ function Main() {
 				try {
 					const Adrs = xhr.responseText;
 					Address.parse(Adrs);
-					if (Adrs == '-1' || Address.parse(Adrs).toString() != Adrs) {
+					if (Adrs == '-1') {
 						let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 						MasterStore.Buy(tonConnectUI, cnt)
 					} else {
