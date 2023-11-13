@@ -86,21 +86,31 @@ function Main() {
 			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
 			xhr.onreadystatechange = function() {
-				const Adrs = xhr.responseText;
-				if (Adrs == '-1' || Address.parse(Adrs).toString() != Adrs) {
-					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+				try {
+					const Adrs = xhr.responseText;
+					Address.parse(Adrs);
+					if (Adrs == '-1' || Address.parse(Adrs).toString() != Adrs) {
+						let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+						MasterStore.Buy(tonConnectUI, cnt)
+					} else {
+						let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+						MasterStore.BuyRefer(tonConnectUI, cnt, Address.parse(Adrs))
+					}
+				} catch {
+					let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 					MasterStore.Buy(tonConnectUI, cnt)
-				} else {
-					let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-					MasterStore.BuyRefer(tonConnectUI, cnt, Address.parse(Adrs))
 				}
 			}
 			xhr.onerror = function() {
-				let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+				MasterStore.Buy(tonConnectUI, cnt)
+			}
+			xhr.ontimeout = function() {
+				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 				MasterStore.Buy(tonConnectUI, cnt)
 			}
 		} catch {
-			let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
 		// Новые данные

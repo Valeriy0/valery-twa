@@ -47,7 +47,7 @@ class MasterStore {
 		const body = beginCell()
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
-        .storeCoins(toNano(amount)) // amount                
+        .storeCoins(amount) // amount                
         .storeAddress(Address.parse(this.MasterAddress))                 
         .storeAddress(Address.parse(tonConnectUI.account.address))             
         .storeUint(0, 1)                      
@@ -79,7 +79,7 @@ class MasterStore {
 		const body = beginCell()
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
-        .storeCoins(toNano(amount)) // amount                
+        .storeCoins(amount) // amount                
         .storeAddress(Address.parse(this.MasterAddress))                 
         .storeAddress(Address.parse(tonConnectUI.account.address))             
         .storeUint(0, 1)                      
@@ -113,7 +113,7 @@ class MasterStore {
 		const body = beginCell()
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
-        .storeCoins(toNano(amount)) // amount                
+        .storeCoins(amount) // amount                
         .storeAddress(Address.parse(this.MasterAddress))                 
         .storeAddress(Address.parse(tonConnectUI.account.address))             
         .storeUint(0, 1)                      

@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 });
  
 connection.connect();
-var sql = "CREATE TABLE if not exists users (id VARCHAR(255) PRIMARY KEY UNIQUE, refer VARCHAR(255))";
+var sql = "CREATE TABLE if not exists usersDB (id VARCHAR(255) PRIMARY KEY UNIQUE, refer VARCHAR(255))";
 connection.query(sql, function (err, result) {
     if (err) throw err;
     console.log("Table created");
@@ -35,7 +35,7 @@ bot.onText(/\/start/, async msg => {
         if(msg.text.length > 6) {
             const refID = "0:" + msg.text.slice(7);
             await bot.sendMessage(msg.chat.id, `Вы зашли по ссылке пользователя с адресом ${refID}`);
-            const sql = `INSERT INTO users (id, refer) VALUES ('${msg.from.id.toString()}', '${refID}')`;
+            const sql = `INSERT INTO usersDB (id, refer) VALUES ('${msg.from.id.toString()}', '${refID}')`;
             console.log(msg.from.id.toString());
             connection.query(sql, function (err, result) {
                 if (err) throw err;
@@ -65,11 +65,11 @@ http.createServer( (req,res)=>{
         req.on('end', function() { 
             console.log(ID, 1);
             connection.query(
-                `SELECT refer FROM users WHERE id = '${ID}'`,
+                `SELECT refer FROM usersDB WHERE id = '${ID}'`,
                 function(err, results, fields) {
                     console.log(results)
                     try {
-                        if (results != null) {
+                        if (results != null && results.length != 0) {
                             console.log(results[0].refer); 
                             res.end(results[0].refer);
                         } else {
