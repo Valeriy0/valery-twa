@@ -8,6 +8,9 @@ import { Address, toNano } from '@ton/core'
 import { useEffect, useState } from 'react'
 import MasterStore from "../../store/master/master"
 import Links from '../../store/links/links';
+import { TonClient } from "@ton/ton";
+import { getHttpEndpoint } from "@orbs-network/ton-access";
+import { Master } from '../../wrappers/Master';
 import classNames from "classNames"
 
 function Main() {
@@ -76,7 +79,7 @@ function Main() {
 		await GreenLineF();
 	}  
 
-	function BuyTokens() {
+	async function BuyTokens() {
 		let xhr = new XMLHttpRequest();
 		xhr.open("POST", "http://127.0.0.1:3000/");
 		try {
@@ -100,6 +103,22 @@ function Main() {
 			let cnt:bigint = BigInt((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
+		// Новые данные
+		const endpoint = await getHttpEndpoint(); 
+		const client = new TonClient({
+			endpoint
+		});
+		const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
+		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
+		let approved = false;
+		while (!approved) {
+			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
+			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+				approved = true;
+				break;
+			}
+		}
+		await GreenLineF();
 	}
 
 	async function ConvertBuy() {
@@ -131,9 +150,30 @@ function Main() {
 		}
 	}
 	
-	function SellTokens() {
+	async function SellTokens() {
 		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
 		MasterStore.Sell(tonConnectUI, cnt)
+		// Новые данные
+		const endpoint = await getHttpEndpoint(); 
+		const client = new TonClient({
+			endpoint
+		});
+		const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
+		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
+		let approved = false;
+		while (!approved) {
+			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
+			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+				approved = true;
+				break;
+			}
+		}
+		setBalance(await MasterStore.GetBalance(tonConnectUI));
+		localStorage["Balance"] = await Balance;
+		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
+		localStorage["BalanceUSD"] = await BalanceUSD;
+		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+		localStorage["OneToken"] = await OneToken;
 	}
 
 	async function ButtonBuyMax() {
