@@ -29,7 +29,6 @@ function Partners() {
 
 	async function GetPartners() {
 		const L = await MasterStore.GetPartners(tonConnectUI);
-		console.log(12, L);
 		if (L != null) {
 			localStorage['Partners'] = L;
 			setPart(L);

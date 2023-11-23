@@ -9,6 +9,7 @@ import { Sender } from '../../wrappers/Sender';
 import { JettonWallet } from '../../wrappers/JettonWallet';
 import { Address, Cell, OpenedContract, toNano } from '@ton/core'
 import axios from 'axios';
+import { BACKEND } from '../../constants'
 
 function binpow(a: bigint, n: bigint):bigint {
 	if (n == 0n){
@@ -44,7 +45,7 @@ class MasterStore {
 
 	Buy = async (tonConnectUI: TonConnectUI, amount: bigint) => {
 		if (tonConnectUI.account?.address == null) return;
-		const body = beginCell()
+		const body = beginCell() 
         .storeUint(0xf8a7ea5, 32)         
         .storeUint(0, 64)                       
         .storeCoins(amount) // amount                
@@ -106,6 +107,11 @@ class MasterStore {
 			],
 			validUntil: Date.now() + 5 * 60 * 1000
 		})
+		try {
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", BACKEND);
+			xhr.send("!" + refer.toString());
+		} catch {}
 	}
 
 	Sell = async (tonConnectUI: TonConnectUI, amount: bigint) => {
@@ -177,7 +183,6 @@ class MasterStore {
 		});
 		const MasterContact = await client.open(Master.createFromAddress(Address.parse(this.MasterAddress)));
 		const Info = await MasterContact.getContractData();
-		console.log(Info);
 		const jettonsAmount = Info.jettonsAmount;
 		const jusdAmount = Info.jusdAmount;
 		return amount * jettonsAmount * 85n / jusdAmount / 100n;
@@ -218,7 +223,6 @@ class MasterStore {
 		const jettonMaster = client.open(JettonMaster.create(Address.parse(this.MinterCustomAddress)));
 		const jettonWallet = await jettonMaster.getWalletAddress(Address.parse(tonConnectUI.account?.address));
 		const Contact = await client.open(JettonWallet.createFromAddress(Address.parse(jettonWallet.toString())));
-		console.log("Баланс", await Contact.getJettonBalance());
 		return (await Contact.getJettonBalance()) / toNano(1);
 	}
 
@@ -231,10 +235,8 @@ class MasterStore {
 		const jettonMaster = client.open(JettonMaster.create(Address.parse(this.MinterJusdAddress)));
 		const jettonWallet = await jettonMaster.getWalletAddress(Address.parse(tonConnectUI.account?.address));
 		const Contact = await client.open(JettonWallet.createFromAddress(Address.parse(jettonWallet.toString())));
-		console.log("Баланс2", await Contact.getJettonBalance());
 		return (await Contact.getJettonBalance()) / toNano(1);
 	}
-
 }
 
 export default new MasterStore();

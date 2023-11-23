@@ -1,8 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
-const http = require('http');
 const mysql = require('mysql2');
 const token = "6919843845:AAG_4xvW9LMOUUsuzcDXbkAvjdyWbAD0na8"
+const express= require('express');
 
+const app = express();
 const bot = new TelegramBot("6919843845:AAG_4xvW9LMOUUsuzcDXbkAvjdyWbAD0na8", {
     polling: true 
 });
@@ -21,14 +22,11 @@ connection.query(sql, function (err, result) {
     console.log("Table created");
 });
 
-// connection.connect(function(err) {
-//     if (err) throw err;
-//     connection.query("SELECT  FROM users WHERE id = '1191496245'", function (err, result) {
-//       if (err) throw err;
-//       console.log(result);
-//     });
-//   });
-
+var sql = "CREATE TABLE if not exists usersID (wallet VARCHAR(255) PRIMARY KEY UNIQUE, id VARCHAR(255))";
+connection.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("Table created");
+});
 
 bot.onText(/\/start/, async msg => {
     try {
@@ -59,7 +57,7 @@ bot.onText(/\/start/, async msg => {
 
 })
 
-http.createServer( (req,res)=>{
+app.get('/', (req,res)=>{
     res.writeHead(200, {
         "Content-Type": "application/json; charset=utf-8",
         "Access-Control-Allow-Origin": "*"
@@ -73,23 +71,61 @@ http.createServer( (req,res)=>{
 
     try {
         req.on('end', function() { 
-            console.log(ID, 1);
-            connection.query(
+            console.log(12312312, ID[0])
+            if (ID[0] == '@') { // add wallet
+                ID = ID.slice(1);
+                let V = ID.split(',');
+                try {
+                    const sql = `INSERT INTO usersID (wallet, id) VALUES ('${V[0]}', '${V[1]}')`;
+                    connection.query(sql, function (err, result) {
+                        console.log("ADD");
+                    }); 
+                } catch {}
+            } else if (ID[0] == '!') { // accept buy
+                ID = ID.slice(1);
+                connection.query(
                 `SELECT refer FROM usersDB WHERE id = '${ID}'`,
                 function(err, results, fields) {
-                    console.log(results)
                     try {
                         if (results != null && results.length != 0) {
-                            console.log(results[0].refer); 
-                            res.end(results[0].refer);
+                            connection.query(
+                            `SELECT id FROM usersID WHERE wallet = '${results[0].refer}'`,
+                            function(err2, results2, fields2) {
+                                try {
+                                    bot.sendMessage(results2[0].id, `У вас новый партнер!`);
+                                    res.end("-1");
+                                } catch {}
+                            }
+                            );
                         } else {
                             res.end("-1");
                         }
+                        
                     } catch {}
                 }
-            );
-            
-        })
+                );
+            } else {
+                console.log(ID, 1);
+                connection.query(
+                    `SELECT refer FROM usersDB WHERE id = '${ID}'`,
+                    function(err, results, fields) {
+                        console.log(results)
+                        try {
+                            if (results != null && results.length != 0) {
+                                console.log(results[0].refer); 
+                                res.end(results[0].refer);
+                            } else {
+                                res.end("-1");
+                            }
+                            
+                        } catch {}
+                    }
+                );
+            }
+        });
+
     } catch {}
     
-}).listen(3000,()=>{console.log("ok")})
+})
+
+app.listen(3000, ()=>{console.log("ok")})

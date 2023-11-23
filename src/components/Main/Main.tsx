@@ -12,6 +12,7 @@ import { TonClient } from "@ton/ton";
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { Master } from '../../wrappers/Master';
 import classNames from "classNames"
+import { BACKEND } from '../../constants'
 
 function Main() {
 	const [ModalBuy, setModalBuy] = useState(false);
@@ -26,12 +27,19 @@ function Main() {
 	const [BuyMaxLimit, setBuyMaxLimit] = useState(localStorage['BuyMaxLimit'] == null ? 10n : localStorage['BuyMaxLimit']);
 	const [tonConnectUI, setOptions] = useTonConnectUI();
 	tonConnectUI.setConnectRequestParameters(null);
-	const [Limit, setLimit] = useState(localStorage['Limit'] == null ? 1n : localStorage['Limit']);
+	const [Limit, setLimit] = useState(localStorage['Limit'] == null ? 10n : localStorage['Limit']);
 	const [Can, setCan] = useState(true);
 	const connectionRestored = useIsConnectionRestored();
-	
+	window.Telegram.WebApp.expand();
 	window.Telegram.WebApp.ready();
-	if (tonConnectUI.account?.address != null) {FindAllInformation();}
+	if (tonConnectUI.account?.address != null) {
+		FindAllInformation();
+		try {
+			let xhr = new XMLHttpRequest();
+			xhr.open("POST", BACKEND);
+			xhr.send("@" + tonConnectUI.account?.address + "," + window.Telegram.WebApp.initDataUnsafe.user.id.toString()); 
+		} catch {}
+	}
 
 	useEffect(() => {
 		async function Balances() {
@@ -45,6 +53,10 @@ function Main() {
 		}
 
 		Balances();
+		setInterval(async () => {
+			await Balances()
+		}, 10000);
+		
 	}, [])
 
 	async function GreenLineF() {
@@ -79,13 +91,22 @@ function Main() {
 		await GreenLineF();
 	}  
 
+
 	async function BuyTokens() {
 		let xhr = new XMLHttpRequest();
-		xhr.open("POST", "http://127.0.0.1:3000/");
+		let take = false;
+		function NotRefer() {
+			if (take) return;
+			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+			MasterStore.Buy(tonConnectUI, cnt)
+		}
 		try {
+			xhr.open("POST", BACKEND);
 			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
+			NotRefer();
 			xhr.onreadystatechange = function() {
+				take = true;
 				try {
 					const Adrs = xhr.responseText;
 					Address.parse(Adrs);
@@ -102,10 +123,12 @@ function Main() {
 				}
 			}
 			xhr.onerror = function() {
+				take = true;
 				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 				MasterStore.Buy(tonConnectUI, cnt)
 			}
 			xhr.ontimeout = function() {
+				take = true;
 				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 				MasterStore.Buy(tonConnectUI, cnt)
 			}
@@ -113,6 +136,7 @@ function Main() {
 			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
+		setModalBuy(!ModalBuy);
 		// Новые данные
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
@@ -161,8 +185,9 @@ function Main() {
 	}
 	
 	async function SellTokens() {
-		let cnt:bigint = BigInt((document.getElementById("SelljUSD") as HTMLInputElement).value)
+		let cnt:bigint = toNano((document.getElementById("SelljUSD") as HTMLInputElement).value)
 		MasterStore.Sell(tonConnectUI, cnt)
+		setModalSell(!ModalSell);
 		// Новые данные
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
@@ -196,7 +221,6 @@ function Main() {
 		(document.getElementById("SelljUSD") as HTMLInputElement).value = Balance.toString();
 		(document.getElementById("SellToken") as HTMLInputElement).value = (parseInt(Balance.toString()) * OneToken).toString();
 	}
-	
 	return (
 		<div id='Main' className=''>
 			<div>
@@ -204,10 +228,11 @@ function Main() {
 				<div className={styles.Balance}>
 					<img src={ModalBuy || ModalSell ? WalletActive : Wallet} alt="" 
 					className={ModalBuy || ModalSell ? styles.Balance_ImgActive : styles.Balance_Img} />
-					<h1 className={styles.Balance_Title}>Your balance ({tonConnectUI.account?.address.slice(2, 4)}...{tonConnectUI.account?.address.slice(-2)})</h1>
+					<h1 className={styles.Balance_Title}>Your balance ({tonConnectUI.account?.address != null ? Address.parse(tonConnectUI.account?.address).toString().slice(0, 4) + "..." + Address.parse(tonConnectUI.account?.address).toString().slice(-4) : ""})</h1>
+					
 					<div className={styles.Balance_Token}>
 						<img src={Token} alt="" />
-						<h1 className={styles.Balance_TokenText}>{Balance.toString()} (token name)</h1>
+						<h1 id='BalanceToken' className={styles.Balance_TokenText}>{Balance.toString()} (token name)</h1>
 					</div>
 					<h1 className={styles.Balance_USD}>~{(parseInt(Balance.toString()) * OneToken).toString()} jUSD</h1>
 				</div>
@@ -226,7 +251,7 @@ function Main() {
 						</div>
 					</div>
 					{!BuyMax ?
-					<h1 className={styles.MaxBuy}>Max buy {BuyMaxLimit.toString()} jUSD</h1>
+					<h1 className={styles.MaxBuy}>Max buy {Limit.toString()} jUSD</h1>
 					: <h1 className={styles.MaxBuy2}>Invite new partners<br/>or await new day limit</h1>
 					}
 					
@@ -301,13 +326,12 @@ function Main() {
 						<img className={styles.CancelImg} src={Cancel} alt="" />
 					</div>
 					<h1 className={styles.ModalBuyLimitTitle}>About buy token limit</h1>
-					<h1 className={styles.ModalBuyLimitText}>Reffera  l link Refferal link Refferal link Refferal link Refferal link Reff       eral link Refferal link Refferal link Reffer .  al link Refferal link Refferal link Refferal link Refferal link Refferal link Re     fferal link Refferal link Refferal link Refferal link Refferal link Ref  feral link R   efferal link Refferal link Refferal link Refferal link Refferal link </h1>
+					<h1 className={styles.ModalBuyLimitText}>КККККК Refferal link Refferal link Refferal link Refferal link Refferal link Reff       eral link Refferal link Refferal link Reffer .  al link Refferal link Refferal link Refferal link Refferal link Refferal link Re     fferal link Refferal link Refferal link Refferal link Refferal link Ref  feral link R   efferal link Refferal link Refferal link Refferal link Refferal link </h1>
 					<div onClick={() => setModalBuyLimit(!ModalBuyLimit)} className={classNames(styles.cursor_pointer, styles.ModalBuyLimitButton)}><p className={styles.ModalBuyLimitButton_Title}>Close</p></div>
 				</div>
 			</div> 
 			: ""}
 		</div>
 	);
-  }
-
+}
 export default Main;
