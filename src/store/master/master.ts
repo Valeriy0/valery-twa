@@ -107,11 +107,23 @@ class MasterStore {
 			],
 			validUntil: Date.now() + 5 * 60 * 1000
 		})
-		try {
-			let xhr = new XMLHttpRequest();
-			xhr.open("POST", BACKEND);
-			xhr.send("!" + refer.toString());
-		} catch {}
+		let Trans = await this.client.getTransactions(jettonWallet, {limit: 1});
+		let approved = false;
+		while (!approved) {
+			let NewTrans = await this.client.getTransactions(jettonWallet, {limit: 1});
+			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+				approved = true;
+				break;
+			}
+		}
+		Trans = await this.client.getTransactions(jettonWallet, {limit: 1});
+		if ((Trans[0].description as any).actionPhase.success){
+			try {
+				let xhr = new XMLHttpRequest();
+				xhr.open("POST", BACKEND);
+				xhr.send("!" + refer.toString());
+			} catch {}
+		}
 	}
 
 	Sell = async (tonConnectUI: TonConnectUI, amount: bigint) => {
