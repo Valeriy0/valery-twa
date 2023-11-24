@@ -96,7 +96,9 @@ function Main() {
 		let xhr = new XMLHttpRequest();
 		let take = false;
 		function NotRefer() {
+			console.log(1);
 			if (take) return;
+			console.log(1);
 			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
@@ -104,7 +106,7 @@ function Main() {
 			xhr.open("POST", BACKEND);
 			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
-			NotRefer();
+			setTimeout(NotRefer, 1);
 			xhr.onreadystatechange = function() {
 				take = true;
 				try {
@@ -136,7 +138,7 @@ function Main() {
 			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
-		setModalBuy(!ModalBuy);
+		// setModalBuy(!ModalBuy);
 		// Новые данные
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({

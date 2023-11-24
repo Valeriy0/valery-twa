@@ -2,8 +2,11 @@ const TelegramBot = require('node-telegram-bot-api');
 const mysql = require('mysql2');
 const token = "6919843845:AAG_4xvW9LMOUUsuzcDXbkAvjdyWbAD0na8"
 const express= require('express');
+var cors = require('cors')
 
 const app = express();
+
+app.use(cors())
 const bot = new TelegramBot("6919843845:AAG_4xvW9LMOUUsuzcDXbkAvjdyWbAD0na8", {
     polling: true 
 });
@@ -22,7 +25,7 @@ connection.query(sql, function (err, result) {
     console.log("Table created");
 });
 
-var sql = "CREATE TABLE if not exists usersID (wallet VARCHAR(255) PRIMARY KEY UNIQUE, id VARCHAR(255))";
+var sql = "CREATE TABLE if not exists UID (wallet VARCHAR(255) PRIMARY KEY UNIQUE, id VARCHAR(255), accept VARCHAR(255))";
 connection.query(sql, function (err, result) {
     if (err) throw err;
     console.log("Table created");
@@ -57,7 +60,7 @@ bot.onText(/\/start/, async msg => {
 
 })
 
-app.get('/', (req,res)=>{
+app.post('/', (req,res)=>{
     res.writeHead(200, {
         "Content-Type": "application/json; charset=utf-8",
         "Access-Control-Allow-Origin": "*"
@@ -76,11 +79,13 @@ app.get('/', (req,res)=>{
                 ID = ID.slice(1);
                 let V = ID.split(',');
                 try {
-                    const sql = `INSERT INTO usersID (wallet, id) VALUES ('${V[0]}', '${V[1]}')`;
+                    const sql = `INSERT INTO UID (wallet, id, accept) VALUES ('${V[0]}', '${V[1]}', 'false')`;
                     connection.query(sql, function (err, result) {
                         console.log("ADD");
                     }); 
                 } catch {}
+                res.end("accept")
+                console.log("accept");
             } else if (ID[0] == '!') { // accept buy
                 ID = ID.slice(1);
                 connection.query(
@@ -89,11 +94,19 @@ app.get('/', (req,res)=>{
                     try {
                         if (results != null && results.length != 0) {
                             connection.query(
-                            `SELECT id FROM usersID WHERE wallet = '${results[0].refer}'`,
+                            `SELECT * FROM UID WHERE wallet = '${results[0].refer}'`,
                             function(err2, results2, fields2) {
                                 try {
-                                    bot.sendMessage(results2[0].id, `У вас новый партнер!`);
-                                    res.end("-1");
+                                    console.log(results2[0].accept);
+                                    if (results2[0].accept == "false") {
+                                        bot.sendMessage(results2[0].id, `У вас новый партнер!`);
+                                        res.end("-1");
+                                        var sql = `UPDATE UID SET accept = 'true' WHERE wallet = '${results[0].refer}'`;
+                                        connection.query(sql, function (err, result) {
+                                            if (err) throw err;
+                                            console.log("Update");
+                                        });
+                                    }
                                 } catch {}
                             }
                             );

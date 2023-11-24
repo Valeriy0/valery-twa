@@ -10,6 +10,7 @@
     "@ton/core": "^0.53.0",
     "@ton/ton": "^13.9.0",
     "@tonconnect/sdk": "^3.0.0-beta.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mysql": "^2.18.1",
