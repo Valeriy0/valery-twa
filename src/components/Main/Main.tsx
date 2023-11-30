@@ -104,7 +104,6 @@ function Main() {
 				take = true;
 				try {
 					const Adrs = xhr.responseText;
-					console.log(1, Adrs);
 					Address.parse(Adrs);
 					if (Adrs == '-1') {
 						MasterStore.Buy(tonConnectUI, cnt)
