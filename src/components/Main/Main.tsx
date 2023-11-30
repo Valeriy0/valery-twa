@@ -95,50 +95,38 @@ function Main() {
 	async function BuyTokens() {
 		let xhr = new XMLHttpRequest();
 		let take = false;
-		function NotRefer() {
-			console.log(1);
-			if (take) return;
-			console.log(1);
-			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
-			MasterStore.Buy(tonConnectUI, cnt)
-		}
+		let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 		try {
 			xhr.open("POST", BACKEND);
 			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
-			setTimeout(NotRefer, 1);
 			xhr.onreadystatechange = function() {
 				take = true;
 				try {
 					const Adrs = xhr.responseText;
+					console.log(1, Adrs);
 					Address.parse(Adrs);
 					if (Adrs == '-1') {
-						let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 						MasterStore.Buy(tonConnectUI, cnt)
 					} else {
-						let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 						MasterStore.BuyRefer(tonConnectUI, cnt, Address.parse(Adrs))
 					}
 				} catch {
-					let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 					MasterStore.Buy(tonConnectUI, cnt)
 				}
 			}
 			xhr.onerror = function() {
 				take = true;
-				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 				MasterStore.Buy(tonConnectUI, cnt)
 			}
 			xhr.ontimeout = function() {
 				take = true;
-				let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 				MasterStore.Buy(tonConnectUI, cnt)
 			}
 		} catch {
-			let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
 			MasterStore.Buy(tonConnectUI, cnt)
 		}
-		// setModalBuy(!ModalBuy);
+		setModalBuy(!ModalBuy);
 		// Новые данные
 		const endpoint = await getHttpEndpoint(); 
 		const client = new TonClient({
