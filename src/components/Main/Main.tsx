@@ -30,8 +30,8 @@ function Main() {
 	const [Limit, setLimit] = useState(localStorage['Limit'] == null ? 10n : localStorage['Limit']);
 	const [Can, setCan] = useState(true);
 	const connectionRestored = useIsConnectionRestored();
-	window.Telegram.WebApp.expand();
-	window.Telegram.WebApp.ready();
+	
+	
 	if (tonConnectUI.account?.address != null) {
 		FindAllInformation();
 		try {
@@ -145,6 +145,7 @@ function Main() {
 	}
 
 	async function ConvertBuy() {
+		while (BalanceUSD == 0n) {}
 		try {
 			let amount = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value);
 			if (amount > toNano(BalanceUSD)) {
@@ -160,6 +161,7 @@ function Main() {
 	}
 
 	async function ConvertSell() {
+		while (Balance == 0n) {}
 		try {
 			let amount = toNano((document.getElementById("SelljUSD") as HTMLInputElement).value);
 			if (amount > toNano(Balance)) {

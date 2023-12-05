@@ -11,12 +11,6 @@ import './App.css'
 import classNames from 'classNames'
 import { Instruction, Rocket } from './assets'
 
-declare global {
-  interface Window {
-      Telegram:any;
-  }
-}
-
 function Connect() {
   return (
     <div className={styles.Main}>
