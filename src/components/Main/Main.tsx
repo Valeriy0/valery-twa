@@ -97,6 +97,7 @@ function Main() {
 		let xhr = new XMLHttpRequest();
 		let take = false;
 		let cnt:bigint = toNano((document.getElementById("BuyjUSD") as HTMLInputElement).value)
+		
 		try {
 			xhr.open("POST", BACKEND);
 			// xhr.send("1191496245");

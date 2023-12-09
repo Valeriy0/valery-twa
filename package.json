@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://mishazhem.github.io/TelegramMiniApp",
+  "homepage": "https://coinvent-solutions.github.io/valery-twa/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
