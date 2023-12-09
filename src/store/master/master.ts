@@ -44,6 +44,7 @@ class MasterStore {
 	}
 
 	Buy = async (tonConnectUI: TonConnectUI, amount: bigint) => {
+		console.log(12);
 		if (tonConnectUI.account?.address == null) return;
 		const body = beginCell() 
         .storeUint(0xf8a7ea5, 32)         

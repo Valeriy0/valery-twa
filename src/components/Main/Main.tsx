@@ -30,7 +30,8 @@ function Main() {
 	const [Limit, setLimit] = useState(localStorage['Limit'] == null ? 10n : localStorage['Limit']);
 	const [Can, setCan] = useState(true);
 	const connectionRestored = useIsConnectionRestored();
-	
+	window.Telegram.WebApp.expand();
+	window.Telegram.WebApp.ready();
 	
 	if (tonConnectUI.account?.address != null) {
 		FindAllInformation();
@@ -100,7 +101,7 @@ function Main() {
 			xhr.open("POST", BACKEND);
 			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
-			xhr.onreadystatechange = function() {
+			xhr.onload = function() {
 				take = true;
 				try {
 					const Adrs = xhr.responseText;

@@ -28,7 +28,6 @@ function Connect() {
   );
 }
 
-
 function App() {
   const [OneToken, setOneToken] = useState(localStorage['OneToken'] == null ? 0.1 : localStorage['OneToken']);
   const [tonConnectUI, setOptions] = useTonConnectUI();
