@@ -6,6 +6,7 @@ import classNames from "classNames"
 import { useState } from 'react'
 import Links from '../../store/links/links';
 import { useTonConnectUI } from '@tonconnect/ui-react'
+import { MessageLink, TelegramLink, TwitterLink, YouTubeLink } from '../../constants'
 
 
 function About() {
@@ -30,10 +31,10 @@ function About() {
 				</div>
 				<h1 className={styles.AboutText}>About project</h1>
 				<div className={styles.AboutButtons}>
-					<img src={Telegram} alt="" className={styles.cursor_pointer} />
-					<img src={Message} alt="" className={styles.cursor_pointer} />
-					<img src={Youtube} alt="" className={styles.cursor_pointer} />
-					<img src={Twitter} alt="" className={styles.cursor_pointer} />
+					<a href={TelegramLink}>	<img src={Telegram} alt="" className={styles.cursor_pointer} /> </a>
+					<a href={MessageLink}> <img src={Message} alt="" className={styles.cursor_pointer} /> </a>
+					<a href={YouTubeLink}> <img src={Youtube} alt="" className={styles.cursor_pointer} /> </a>
+					<a href={TwitterLink}> <img src={Twitter} alt="" className={styles.cursor_pointer} /> </a>
 				</div>
 				<div className={styles.MainPdf}>
 					<h1 className={styles.MainPdf_Text}>Main PDF</h1>
