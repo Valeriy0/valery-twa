@@ -14,7 +14,7 @@ declare global {
 }
 
 // this manifest is used temporarily for development purposes
-const manifestUrl = 'https://raw.githubusercontent.com/ton-defi-org/tonconnect-manifest-temp/main/tonconnect-manifest.json';
+const manifestUrl = 'https://raw.githubusercontent.com/ton-connect/demo-dapp/master/public/tonconnect-manifest.json';
 window.Telegram.WebApp.expand();
 window.Telegram.WebApp.ready();
 

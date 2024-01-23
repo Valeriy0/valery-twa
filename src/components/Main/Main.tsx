@@ -100,6 +100,7 @@ function Main() {
 		
 		try {
 			xhr.open("POST", BACKEND);
+			// xhr.send("1191496245");
 			xhr.send(window.Telegram.WebApp.initDataUnsafe.user.id.toString()); // window.Telegram.WebAppUser.id
 			xhr.onload = function() {
 				take = true;

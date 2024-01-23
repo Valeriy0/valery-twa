@@ -19,6 +19,7 @@ function Connect() {
 			<div className={styles.tonConnectBtn}>
 				<TonConnectButton className={styles.tonConnectBtn__btn} />
 			</div>
+			
 			<div  className={styles.Instruction}>
 				<img src={Instruction} alt="" />
 				<h1 className={styles.Instruction__Title}>Instruction</h1>
