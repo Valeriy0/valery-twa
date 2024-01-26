@@ -67,15 +67,14 @@ function Main() {
 		const L = await MasterStore.GetLimit(tonConnectUI) / toNano(1);
 		setLimit(L);
 		localStorage["Limit"] = L;
-		if (L == 0n) {
-			setBuyMax(true);
-		} else {
-			if (typeof L == "bigint") {
-				const t = document.getElementById("GreenLine");
-				const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
-				if (t != null) {
-					t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 0.8s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
-				}
+		if (typeof L == "bigint") {
+			const t = document.getElementById("GreenLine");
+			const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
+			if (L == 0n) {
+				setBuyMax(true);
+			}
+			if (t != null) {
+				t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 0.8s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
 			}
 		}
 		setBalance(await MasterStore.GetBalance(tonConnectUI));

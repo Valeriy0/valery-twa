@@ -2,7 +2,7 @@ import styles from "../styles/global.module.scss"
 import { Main, Partners, About } from './components';
 import { Routes, Route } from "react-router-dom";
 import Marquee from "react-fast-marquee";
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TonConnectButton, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react'
 import MasterStore from './store/master/master';
 import { toNano } from '@ton/core'
@@ -33,16 +33,23 @@ function App() {
   const [OneToken, setOneToken] = useState(localStorage['OneToken'] == null ? 0.1 : localStorage['OneToken']);
   const [tonConnectUI, setOptions] = useTonConnectUI();
   const wallet = useTonWallet();
-  if (wallet == null) {
-    return Connect();
-  }
-  if (tonConnectUI.account?.address != null) {GetToken();}
-
-	async function GetToken() {
-		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-		localStorage["OneToken"] = await OneToken;
-		document.getElementsByClassName(styles.Ticker)[0].classList.remove('hidden');
-	}  
+  useEffect(() => {
+		async function GetToken() {
+			if (tonConnectUI.account?.address == null) return;
+			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+			localStorage["OneToken"] = await OneToken;
+			document.getElementsByClassName(styles.Ticker)[0].classList.remove('hidden');
+		}  
+	
+		GetToken();
+		setInterval(async () => {
+			await GetToken()
+		}, 10000);
+		
+	}, []);
+	if (wallet == null) {
+		return Connect();
+	}
 
   return (
     <>

@@ -34,9 +34,9 @@ function sleep(ms: number) {
   
 
 class MasterStore {
-	MasterAddress = "EQCDSxqIWdChwZNaI8DoWno9T5t3mPGqyyV23CPWR4qIuifJ"; 
+	MasterAddress = "EQCI-UM_f8IcQgLk_i-hEnXT9mkuvZyhWrnpOEYKRaEqSoYX"; 
 	MinterJusdAddress = "EQDjwcQzRCUSiy8Y0sIQDoIwxSqaErJdRpmzENl6YlnqcDy-";
-	MinterCustomAddress = "EQCSwg3O44ZYVQE8XGTv00-Hp2Ph7N45F_WfK8dWqqXKa13Q"; 
+	MinterCustomAddress = "EQCQamNt4foTku5RihGz8ZdXm86ksdOo9LInZzhUq42iu941"; 
 	client: TonClient | null = null;
 
     constructor() {
@@ -44,7 +44,6 @@ class MasterStore {
 	}
 
 	Buy = async (tonConnectUI: TonConnectUI, amount: bigint) => {
-		console.log(12);
 		if (tonConnectUI.account?.address == null) return;
 		const body = beginCell() 
         .storeUint(0xf8a7ea5, 32)         
@@ -147,6 +146,7 @@ class MasterStore {
 		const userAddress = Address.parse(tonConnectUI.account.address)
 		const jettonMaster = this.client.open(JettonMaster.create(jettonMasterAddress))
 		const jettonWallet = await jettonMaster.getWalletAddress(userAddress);
+		console.log(5, jettonWallet.toString())
 		await tonConnectUI.sendTransaction({
 			messages: [
 				{

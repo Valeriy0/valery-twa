@@ -25,16 +25,22 @@ function Partners() {
 	// 	} catch {}
 	// };
 
-	if (tonConnectUI.account?.address != null) {GetPartners();}
-
-	async function GetPartners() {
-		const L = await MasterStore.GetPartners(tonConnectUI);
-		if (L != null) {
-			localStorage['Partners'] = L;
-			setPart(L);
+	useEffect(() => {
+		async function GetPartners() {
+			if (tonConnectUI.account?.address == null) return;
+			const L = await MasterStore.GetPartners(tonConnectUI);
+			if (L != null) {
+				localStorage['Partners'] = L;
+				setPart(L);
+			}
 		}
-	}
 
+		GetPartners();
+		setInterval(async () => {
+			await GetPartners()
+		}, 10000);
+		
+	}, [])
 
 	function CopyFunc() {
 		let text = (document.getElementById("Link")  as HTMLInputElement).textContent;
