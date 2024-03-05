@@ -46,7 +46,17 @@ function Main() {
 	useEffect(() => {
 		async function Balances() {
 			setSellMax(false);
-			await MasterStore.sleep(300);	
+			const L = await MasterStore.GetLimit() / toNano(1);
+			console.log("L", L)
+			setLimit(L);
+			localStorage["Limit"] = L;
+			if (typeof L == "bigint" && L == 0n) {
+				setBuyMax(true);
+			} else {
+				setBuyMax(false);
+			}	
+
+			await MasterStore.sleep(1400);	
 			const Bal = await MasterStore.GetBalance(tonConnectUI);
 			console.log("Balance", Bal);
 			setBalance(Bal);
@@ -57,16 +67,7 @@ function Main() {
 			console.log("BalanceUSD", USD);
 			setBalanceUSD(USD);
 			localStorage["BalanceUSD"] = USD;
-			await MasterStore.sleep(1400);	
-			const L = await MasterStore.GetLimit() / toNano(1);
-			console.log("L", L)
-			setLimit(L);
-			localStorage["Limit"] = L;
-			if (typeof L == "bigint" && L == 0n) {
-				setBuyMax(true);
-			} else {
-				setBuyMax(false);
-			}
+			
 			await MasterStore.sleep(1100);	
 			const TempBuyMaxLimit = (await MasterStore.MaxBuyLimit());
 			console.log("TempBuyMaxLimit", TempBuyMaxLimit)
@@ -95,7 +96,7 @@ function Main() {
 			}
 		}
 		MasterStore.InitialStart(tonConnectUI);
-		setTimeout(() => Balances(), 4110);
+		setTimeout(() => Balances(), 4010);
 		setInterval(async () => {
 			await Balances()
 		}, 25300);
