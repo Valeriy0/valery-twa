@@ -22,7 +22,8 @@ function Main() {
 	const [Balance, setBalance] = useState(localStorage['Balance'] == null ? 0n : localStorage['Balance']);
 	const [BalanceUSD, setBalanceUSD] = useState(localStorage['BalanceUSD'] == null ? 0n : localStorage['BalanceUSD']);
 	const [ModalBuyLimit, setModalBuyLimit] = useState(false);
-	const [BuyMax, setBuyMax] = useState(false);
+	const [BuyMax, setBuyMax] = useState(true);
+	const [SellMax, setSellMax] = useState(true);
 	const [AppearGreen, setAppearGreen] = useState(localStorage['AppearGreen'] == null ? false : localStorage['AppearGreen']);
 	const [BuyMaxLimit, setBuyMaxLimit] = useState(localStorage['BuyMaxLimit'] == null ? 10n : localStorage['BuyMaxLimit']);
 	const [tonConnectUI, setOptions] = useTonConnectUI();
@@ -34,7 +35,7 @@ function Main() {
 	window.Telegram.WebApp.ready();
 	
 	if (tonConnectUI.account?.address != null) {
-		FindAllInformation();
+		// FindAllInformation();
 		try {
 			let xhr = new XMLHttpRequest();
 			xhr.open("POST", BACKEND);
@@ -44,54 +45,63 @@ function Main() {
 
 	useEffect(() => {
 		async function Balances() {
-			setBalance(await MasterStore.GetBalance(tonConnectUI));
-			localStorage["Balance"] = await Balance;
-			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-			localStorage["OneToken"] = await OneToken;
-			setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
-			localStorage["BalanceUSD"] = await BalanceUSD;
-			await GreenLineF();
-		}
+			setSellMax(false);
+			await MasterStore.sleep(300);	
+			const Bal = await MasterStore.GetBalance(tonConnectUI);
+			console.log("Balance", Bal);
+			setBalance(Bal);
+			localStorage["Balance"] = Bal;
 
-		Balances();
+			await MasterStore.sleep(1200);	
+			const USD = await MasterStore.GetBalanceUSD(tonConnectUI);
+			console.log("BalanceUSD", USD);
+			setBalanceUSD(USD);
+			localStorage["BalanceUSD"] = USD;
+			await MasterStore.sleep(1400);	
+			const L = await MasterStore.GetLimit() / toNano(1);
+			console.log("L", L)
+			setLimit(L);
+			localStorage["Limit"] = L;
+			if (typeof L == "bigint" && L == 0n) {
+				setBuyMax(true);
+			} else {
+				setBuyMax(false);
+			}
+			await MasterStore.sleep(1100);	
+			const TempBuyMaxLimit = (await MasterStore.MaxBuyLimit());
+			console.log("TempBuyMaxLimit", TempBuyMaxLimit)
+			setBuyMaxLimit(TempBuyMaxLimit);
+			localStorage["BuyMaxLimit"] = TempBuyMaxLimit;
+			
+			if (typeof L == "bigint") {
+				const t = document.getElementById("GreenLine");
+				const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
+				if (t != null) {
+					t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 0.8s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
+				}
+			}
+
+			await MasterStore.sleep(1100);	
+			const Token = parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString());
+			console.log("Token", Token);
+			setOneToken(Token);
+			localStorage["OneToken"] = Token;
+
+			await MasterStore.sleep(1010);	
+			const Part = await MasterStore.GetPartners();
+			console.log("Part", Part);
+			if (Part != null) {
+				localStorage['Partners'] = Part;
+			}
+		}
+		MasterStore.InitialStart(tonConnectUI);
+		setTimeout(() => Balances(), 4110);
 		setInterval(async () => {
 			await Balances()
-		}, 10000);
+		}, 25300);
 		
 	}, [])
-
-	async function GreenLineF() {
-		const TempBuyMaxLimit = (await MasterStore.MaxBuyLimit(tonConnectUI));
-		setBuyMaxLimit(TempBuyMaxLimit);
-		localStorage["BuyMaxLimit"] = TempBuyMaxLimit;
-		const L = await MasterStore.GetLimit(tonConnectUI) / toNano(1);
-		setLimit(L);
-		localStorage["Limit"] = L;
-		if (typeof L == "bigint") {
-			const t = document.getElementById("GreenLine");
-			const Width = 295 * (parseInt((BigInt(TempBuyMaxLimit) - L).toString()) / parseInt(TempBuyMaxLimit.toString()));
-			if (L == 0n) {
-				setBuyMax(true);
-			}
-			if (t != null) {
-				t.setAttribute('style', `z-index: 0; position: absolute; left: -${Width}px; width: ${Width}px; transition: 0.8s; transform:translateX(${Width}px) translateY(0px) translateZ(0px);`);
-			}
-		}
-		setBalance(await MasterStore.GetBalance(tonConnectUI));
-		localStorage["Balance"] = await Balance;
-		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-		localStorage["OneToken"] = await OneToken;
-		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
-		localStorage["BalanceUSD"] = await BalanceUSD;
-	}
-
-	async function FindAllInformation() {
-		if (!Can) return;
-		setCan(false);
-		await GreenLineF();
-	}  
-
-
+	
 	async function BuyTokens() {
 		let xhr = new XMLHttpRequest();
 		let take = false;
@@ -127,21 +137,19 @@ function Main() {
 		}
 		setModalBuy(!ModalBuy);
 		// Новые данные
-		const endpoint = await getHttpEndpoint(); 
-		const client = new TonClient({
-			endpoint
-		});
-		const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
-		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
-		let approved = false;
-		while (!approved) {
-			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
-			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
-				approved = true;
-				break;
-			}
-		}
-		await GreenLineF();
+		// const client = new TonClient({
+		// 	endpoint: 'https://toncenter.com/api/v2/jsonRPC',
+		// });
+		// const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
+		// let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
+		// let approved = false;
+		// while (!approved) {
+		// 	let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
+		// 	if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+		// 		approved = true;
+		// 		break;
+		// 	}
+		// }
 	}
 
 	async function ConvertBuy() {
@@ -157,7 +165,6 @@ function Main() {
 		} catch {
 			document.getElementById("InvalidBuy")?.classList.remove('hidden');
 		}
-		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 	}
 
 	async function ConvertSell() {
@@ -180,32 +187,24 @@ function Main() {
 		MasterStore.Sell(tonConnectUI, cnt)
 		setModalSell(!ModalSell);
 		// Новые данные
-		const endpoint = await getHttpEndpoint(); 
-		const client = new TonClient({
-			endpoint
-		});
-		const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
-		let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
-		let approved = false;
-		while (!approved) {
-			let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
-			if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
-				approved = true;
-				break;
-			}
-		}
-		setBalance(await MasterStore.GetBalance(tonConnectUI));
-		localStorage["Balance"] = await Balance;
-		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
-		localStorage["BalanceUSD"] = await BalanceUSD;
-		setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-		localStorage["OneToken"] = await OneToken;
+		// const client = new TonClient({
+		// 	endpoint: 'https://toncenter.com/api/v2/jsonRPC',
+		// });
+		// const MasterContact = client.open(Master.createFromAddress(Address.parse(MasterStore.MasterAddress)));
+		// let Trans = await client.getTransactions(MasterContact.address, {limit: 1});
+		// let approved = false;
+		// while (!approved) {
+		// 	let NewTrans = await client.getTransactions(MasterContact.address, {limit: 1});
+		// 	if (NewTrans[0].prevTransactionLt != Trans[0].prevTransactionLt) {
+		// 		approved = true;
+		// 		break;
+		// 	}
+		// }
 	}
 
 	async function ButtonBuyMax() {
 		(document.getElementById("BuyjUSD") as HTMLInputElement).value = (Math.min(parseInt(BalanceUSD.toString()), parseInt(Limit.toString()))).toString();
 		await ConvertBuy();
-		setBalanceUSD(await MasterStore.GetBalanceUSD(tonConnectUI));
 	}
 
 	function ButtonSellMax() {
@@ -249,7 +248,7 @@ function Main() {
 				</div>
 				<div className={styles.Buttons}>
 					<div onClick={!BuyMax ? () => setModalBuy(!ModalBuy) : () => setModalBuy(ModalBuy)} className={classNames(styles.cursor_pointer, (!BuyMax ? styles.ButtonsBuy : styles.ButtonsBuy2))}><p>Buy</p></div>
-					<div onClick={() => setModalSell(!ModalSell)} className={classNames(styles.cursor_pointer, styles.ButtonsSell)}><p>Sell</p></div>
+					<div onClick={!SellMax ? () => setModalSell(!ModalSell) : () => setModalSell(ModalSell)} className={classNames(styles.cursor_pointer, (!SellMax ? styles.ButtonsSell : styles.ButtonsSell2))}><p>Sell</p></div>
 				</div>
 			</div>
 			<div className={styles.Footer}>

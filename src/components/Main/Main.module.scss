@@ -253,6 +253,16 @@
 		border-radius: 10px;
 		background: rgba(187, 44, 35, 0.40);
 	}
+
+	&Sell2 {
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		width: 99px;
+		height: 56px;
+		border-radius: 10px;
+		background: rgba(187, 44, 35, 0.20);
+	}
 }
 
 .Footer {

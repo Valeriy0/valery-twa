@@ -35,16 +35,17 @@ function App() {
   const wallet = useTonWallet();
   useEffect(() => {
 		async function GetToken() {
-			if (tonConnectUI.account?.address == null) return;
-			setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
-			localStorage["OneToken"] = await OneToken;
+			// if (tonConnectUI.account?.address == null) return;
+			// setOneToken(parseInt(await (await MasterStore.ConvertSell(toNano(1))).toString()) / parseInt(toNano(1).toString()));
+			// localStorage["OneToken"] = await OneToken;
+			// document.getElementsByClassName(styles.Ticker)[0].classList.remove('hidden');
+			setOneToken(localStorage["OneToken"]);
 			document.getElementsByClassName(styles.Ticker)[0].classList.remove('hidden');
 		}  
-	
-		GetToken();
+
 		setInterval(async () => {
 			await GetToken()
-		}, 10000);
+		}, 4000);
 		
 	}, []);
 	if (wallet == null) {

@@ -27,15 +27,14 @@ function Partners() {
 
 	useEffect(() => {
 		async function GetPartners() {
-			if (tonConnectUI.account?.address == null) return;
-			const L = await MasterStore.GetPartners(tonConnectUI);
-			if (L != null) {
-				localStorage['Partners'] = L;
-				setPart(L);
-			}
+			// if (tonConnectUI.account?.address == null) return;
+			// const L = await MasterStore.GetPartners(tonConnectUI);
+			// if (L != null) {
+			// 	localStorage['Partners'] = L;
+			// 	setPart(L);
+			// }
+			setPart(localStorage['Partners']);
 		}
-
-		GetPartners();
 		setInterval(async () => {
 			await GetPartners()
 		}, 10000);

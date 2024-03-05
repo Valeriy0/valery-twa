@@ -70,11 +70,18 @@ export class JettonWallet implements Contract {
         });
     }
 
+    async sleep(ms: number) {
+		return new Promise(
+			  resolve => setTimeout(resolve, ms)
+		);
+	}
+
     async getJettonBalance(provider: ContractProvider) {
         let state = await provider.getState();
         if (state.state.type !== 'active') {
             return 0n;
         }
+        await this.sleep(1010);
         let res = await provider.get('get_wallet_data', []);
         return res.stack.readBigNumber();
     }

@@ -60,8 +60,15 @@ export class Helper implements Contract {
         };
     }
 
+    async sleep(ms: number) {
+		return new Promise(
+			  resolve => setTimeout(resolve, ms)
+		);
+	}
+
     async getBuyLimits(provider: ContractProvider): Promise<bigint> {
         if ((await provider.getState()).state.type == 'active') {
+            await this.sleep(1010);
             const res = (await provider.get('get_buy_limits', [])).stack;
             return res.readBigNumber();
         } else {
